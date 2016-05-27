@@ -1,9 +1,9 @@
 package com.tanshizw.launcher;
 
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
 import android.os.Bundle;
 
-public class launcher extends AppCompatActivity {
+public class launcher extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
