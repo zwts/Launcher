@@ -1,12 +1,14 @@
 package com.tanshizw.launcher;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -15,22 +17,34 @@ import java.util.List;
 
 public class launcher extends Activity {
     private List<ResolveInfo> apps;
-    private GridView gridView;
+    private GridView appGridView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
         loadApps();
-        gridView  = (GridView)findViewById(R.id.apps_list);
-        AppAdapter adapter = new AppAdapter(this);
-        gridView.setAdapter(adapter);
+        appGridView  = (GridView)findViewById(R.id.apps_list);
+        appGridView.setAdapter(new AppAdapter(this));
+        appGridView.setOnItemClickListener(itemClickListener);
     }
+
+    private AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            ResolveInfo info = apps.get(i);
+            String pkgName = info.activityInfo.packageName;
+            String mainActivityName = info.activityInfo.name;
+
+            ComponentName componentName = new ComponentName(pkgName, mainActivityName);
+            Intent intent = new Intent();
+            intent.setComponent(componentName);
+            startActivity(intent);
+        }
+    };
 
     private void loadApps() {
         Intent intent = new Intent(Intent.ACTION_MAIN, null);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
 
         apps = getPackageManager().queryIntentActivities(intent, 0);
