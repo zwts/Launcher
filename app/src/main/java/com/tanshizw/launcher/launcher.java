@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 
@@ -18,6 +19,7 @@ import java.util.List;
 public class launcher extends Activity {
     private List<ResolveInfo> apps;
     private GridView appGridView;
+    private Button chooseWallpaperBt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +29,20 @@ public class launcher extends Activity {
         appGridView  = (GridView)findViewById(R.id.apps_list);
         appGridView.setAdapter(new AppAdapter(this));
         appGridView.setOnItemClickListener(itemClickListener);
+
+        chooseWallpaperBt = (Button)findViewById(R.id.choose_wallpaper);
+        chooseWallpaperBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onSetWallpaper();
+            }
+        });
+    }
+
+    public void onSetWallpaper() {
+        final Intent pickWallpaper = new Intent(Intent.ACTION_SET_WALLPAPER);
+        Intent chooser = Intent.createChooser(pickWallpaper, "choose_wallpaper");
+        startActivity(chooser);
     }
 
     private AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {

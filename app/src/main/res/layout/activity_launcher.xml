@@ -2,8 +2,7 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/workspace_bg" >
+    android:layout_height="match_parent">
 
     <GridView
         android:layout_width="match_parent"
@@ -11,4 +10,21 @@
         android:id="@+id/apps_list"
         android:numColumns="4">
     </GridView>
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="choose widget"
+        android:id="@+id/choose_widget"
+        android:layout_gravity="left|bottom" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="choose wallpaper"
+        android:id="@+id/choose_wallpaper"
+        android:layout_gravity="right|bottom" />
+
 </FrameLayout>
