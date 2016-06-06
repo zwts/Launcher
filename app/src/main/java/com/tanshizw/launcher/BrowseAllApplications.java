@@ -6,12 +6,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -21,6 +24,10 @@ import java.util.List;
 public class BrowseAllApplications extends Activity {
     private List<ResolveInfo> apps;
     private GridView appGridView;
+    private int itemHeight = 100;
+    private int itemWidth = 100;
+    private int iconHeight = 60;
+    private int iconWidth = 60;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,7 +38,6 @@ public class BrowseAllApplications extends Activity {
         appGridView.setAdapter(new AppAdapter(this));
         appGridView.setOnItemClickListener(itemClickListener);
     }
-
 
     private AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
         @Override
@@ -78,18 +84,30 @@ public class BrowseAllApplications extends Activity {
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
-            ImageView imagev;
+            View appItem;
+
             if (view == null) {
-                imagev = new ImageView(context);
-                imagev.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                imagev.setLayoutParams(new GridView.LayoutParams(105, 105));
+                LayoutInflater inflater = getLayoutInflater().from(context);
+                appItem = inflater.inflate(R.layout.application_item, null);
+
+                ImageView icon = (ImageView) appItem.findViewById(R.id.item_icon);
+                TextView name = (TextView) appItem.findViewById(R.id.item_name);
+
+                icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                ViewGroup.LayoutParams iconParams = icon.getLayoutParams();
+                iconParams.height = iconHeight;
+                iconParams.width = iconWidth;
+                icon.setLayoutParams(iconParams);
+                appItem.setLayoutParams(new GridView.LayoutParams(itemWidth, itemHeight));
+
+                ResolveInfo info = apps.get(i);
+                name.setText(info.activityInfo.loadLabel(getPackageManager()));
+                icon.setImageDrawable(info.activityInfo.loadIcon(getPackageManager()));
             } else {
-                imagev = (ImageView) view;
+                appItem = view;
             }
 
-            ResolveInfo info = apps.get(i);
-            imagev.setImageDrawable(info.activityInfo.loadIcon(getPackageManager()));
-            return imagev;
+            return appItem;
         }
     }
 
