@@ -9,4 +9,18 @@
     </style>
     <style name="Newthem" parent="android:Theme.Wallpaper.NoTitleBar"></style>
 
+    <style name="WorkspaceIcon">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:textColor">@color/workspace_icon_text_color</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:shadowRadius">0</item>
+        <item name="customShadows">false</item>
+
+    </style>
+
 </resources>
