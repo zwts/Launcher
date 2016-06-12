@@ -14,7 +14,6 @@ import java.util.HashMap;
  */
 public class Workspace extends SmoothPagedView implements Insettable{
     private HashMap<Long, CellLayout> mWorkspaceScreens = new HashMap<Long, CellLayout>();
-    final static long EXTRA_EMPTY_SCREEN_ID = -201;
     private static final String TAG = "Launcher.Workspace";
     private Launcher mLauncher;
 
@@ -42,13 +41,7 @@ public class Workspace extends SmoothPagedView implements Insettable{
 
     }
 
-    void addInScreenFromBind(View child, long container, long screenId, int x, int y,
-                             int spanX, int spanY) {
-        addInScreen(child, container, screenId, x, y, spanX, spanY, false, true);
-    }
-
-    void addInScreen(View child, long container, long screenId, int x, int y, int spanX, int spanY,
-                     boolean insert, boolean computeXYFromRank) {
+    void addInScreenFromBind(View child, long container, long screenId, int x, int y, int spanX, int spanY) {
         if (container == Launcher.CONTAINER_DESKTOP) {
             if (getScreenWithId(screenId) == null) {
                 Log.e(TAG, "Skipping child, screenId " + screenId + " not found");
@@ -56,10 +49,6 @@ public class Workspace extends SmoothPagedView implements Insettable{
                 new Throwable().printStackTrace();
                 return;
             }
-        }
-        if (screenId == EXTRA_EMPTY_SCREEN_ID) {
-            // This should never happen
-            throw new RuntimeException("Screen id should not be EXTRA_EMPTY_SCREEN_ID");
         }
 
         CellLayout layout = null;
@@ -82,14 +71,10 @@ public class Workspace extends SmoothPagedView implements Insettable{
             lp.cellVSpan = spanY;
         }
 
-        if (spanX < 0 && spanY < 0) {
-            lp.isLockedToGrid = false;
-        }
-
         // Get the canonical child id to uniquely represent this view in this screen
         ItemInfo info = (ItemInfo) child.getTag();
         int childId = mLauncher.getViewIdForItem(info);
-        if (!layout.addViewToCellLayout(child, insert ? 0 : -1, childId, lp, true)) {
+        if (!layout.addViewToCellLayout(child, 0, childId, lp, true)) {
             // TODO: This branch occurs when the workspace is adding views
         }
     }

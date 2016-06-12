@@ -130,6 +130,9 @@ public class Launcher extends Activity {
                     workspace.addInScreenFromBind(shortcut, item.container, item.screenId, item.cellX,
                             item.cellY, 1, 1);
                     workspace.requestLayout();
+                    break;
+                default:
+                    break;
             }
         }
     }

@@ -9,13 +9,15 @@ import android.view.ViewGroup;
  * Created by user on 6/6/16.
  */
 public class CellLayout extends ViewGroup {
-    private int mCountX;
-    private int mCountY;
+    private int mCountX = 5;//mCountX cells in horizental
+    private int mCountY = 4;//mCountY cells in vertical
     boolean[][] mOccupied;
     private ShortcutAndWidgetContainer mShortcutsAndWidgets;
 
     public CellLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mShortcutsAndWidgets = new ShortcutAndWidgetContainer(context, attrs);
+        addView(mShortcutsAndWidgets);
     }
 
     public View getChildAt(int x, int y) {
@@ -101,13 +103,10 @@ public class CellLayout extends ViewGroup {
          * Vertical location of the item in the grid.
          */
         public int cellY;
+        //cellHSpan Width in cells
         public int cellHSpan;
+        //cellVSpan Height in cells
         public int cellVSpan;
-        /**
-         * Indicates whether the item will set its x, y, width and height parameters freely,
-         * or whether these will be computed based on cellX, cellY, cellHSpan and cellVSpan.
-         */
-        public boolean isLockedToGrid = true;
 
         public LayoutParams(Context c, AttributeSet attrs) {
             super(c, attrs);
