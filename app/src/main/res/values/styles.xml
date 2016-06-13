@@ -17,9 +17,8 @@
         <item name="android:singleLine">true</item>
         <item name="android:ellipsize">marquee</item>
         <item name="android:textColor">@color/workspace_icon_text_color</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">24sp</item>
         <item name="android:shadowRadius">0</item>
-        <item name="customShadows">false</item>
 
     </style>
 

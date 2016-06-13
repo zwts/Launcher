@@ -51,9 +51,4 @@ public class ItemInfo {
      * Title of the item
      */
     CharSequence title;
-
-    /**
-     * Content description of the item.
-     */
-    CharSequence contentDescription;
 }

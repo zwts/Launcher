@@ -1,10 +1,10 @@
 package com.tanshizw.launcher;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.TextView;
 
 /**
@@ -13,19 +13,21 @@ import android.widget.TextView;
 public class BubbleTextView extends TextView {
     private int mTextColor;
     private boolean mIsTextVisible;
+    private final String TAG = "BubbleTextView";
     public BubbleTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        Log.v(TAG, "BubbleTextView");
     }
 
-    public void applyFromShortcutInfo(ShortcutInfo info, //IconCache iconCache,
-                                      boolean setDefaultPadding) {
-        applyFromShortcutInfo(info, setDefaultPadding, false);
-    }
+    public void applyFromShortcutInfo(ShortcutInfo info) {
+        Resources resources = Resources.getSystem();
+        Drawable drawable = resources.getDrawable(android.R.mipmap.sym_def_app_icon);
+        drawable.setBounds(0, 0, 100, 100);
+        setCompoundDrawables(drawable, null, null, null);
 
-    public void applyFromShortcutInfo(ShortcutInfo info, //IconCache iconCache,
-                                      boolean setDefaultPadding, boolean promiseStateChanged) {
-        //// TODO: 6/8/16
-        Bitmap b = info.getIcon();
+        setText(info.title);
+        Log.v(TAG, "applyFromShortcutInfo info.title = " + info.title);
+        setTag(info);
     }
 
     @Override
@@ -34,19 +36,14 @@ public class BubbleTextView extends TextView {
         super.setTextColor(color);
     }
 
-    @Override
-    public void setTextColor(ColorStateList colors) {
-        mTextColor = colors.getDefaultColor();
-        super.setTextColor(colors);
-    }
-
     public void setTextVisibility(boolean visible) {
         Resources res = getResources();
         if (visible) {
-            super.setTextColor(mTextColor);
+            super.setTextColor(res.getColor(android.R.color.white));
         } else {
             super.setTextColor(res.getColor(android.R.color.transparent));
         }
         mIsTextVisible = visible;
     }
+
 }

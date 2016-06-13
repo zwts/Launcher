@@ -12,14 +12,15 @@
 
         <com.tanshizw.launcher.Workspace
             android:id="@+id/workspace"
-            android:layout_height="200dip"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:layout_gravity="center">
         </com.tanshizw.launcher.Workspace>
-
+<!--
         <include
             layout="@layout/hot_seat"
             android:id="@+id/hot_seat" />
+-->
 
     </com.tanshizw.launcher.DragLayer>
 </FrameLayout>

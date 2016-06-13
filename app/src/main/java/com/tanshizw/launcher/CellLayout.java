@@ -1,32 +1,47 @@
 package com.tanshizw.launcher;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 /**
  * Created by user on 6/6/16.
  */
 public class CellLayout extends ViewGroup {
-    private int mCountX = 5;//mCountX cells in horizental
-    private int mCountY = 4;//mCountY cells in vertical
+    private int mCountX = 6;//mCountX cells in horizental
+    private int mCountY = 6;//mCountY cells in vertical
+    private int mCellWidth = 100;
     boolean[][] mOccupied;
     private ShortcutAndWidgetContainer mShortcutsAndWidgets;
+    private final String TAG = "CellLayout";
 
     public CellLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+        Log.v(TAG, "CellLayout");
+        mOccupied = new boolean[mCountX][mCountY];
         mShortcutsAndWidgets = new ShortcutAndWidgetContainer(context, attrs);
         addView(mShortcutsAndWidgets);
     }
 
-    public View getChildAt(int x, int y) {
-        return mShortcutsAndWidgets.getChildAt(x, y);
-    }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        Log.v(TAG, "onLayout l = " + l + "; t = " + t + "; r = " + r + "; b = " + b);
+        for(int i = 0; i < getChildCount(); i++){
+            final View child = getChildAt(getChildCount() - i - 1);
+            child.layout(l, t, r, b);
+        }
+    }
 
+    @Override
+    protected void onDraw(Canvas canvas) {
+        Log.v(TAG, "onDraw");
     }
 
     public boolean isOccupied(int x, int y) {
@@ -48,26 +63,23 @@ public class CellLayout extends ViewGroup {
 
         // Hotseat icons - remove text
         if (child instanceof BubbleTextView) {
+            Log.v(TAG, "addViewToCellLayout BubbleTextView");
             BubbleTextView bubbleChild = (BubbleTextView) child;
             bubbleChild.setTextVisibility(true);
         }
-
+        Log.v(TAG, "addViewToCellLayout getChildrenScale = " + getChildrenScale());
         child.setScaleX(getChildrenScale());
         child.setScaleY(getChildrenScale());
 
-        // Generate an id for each view, this assumes we have at most 256x256 cells
-        // per workspace screen
         if (lp.cellX >= 0 && lp.cellX <= mCountX - 1 && lp.cellY >= 0 && lp.cellY <= mCountY - 1) {
-            // If the horizontal or vertical span is set to -1, it is taken to
-            // mean that it spans the extent of the CellLayout
             if (lp.cellHSpan < 0) lp.cellHSpan = mCountX;
             if (lp.cellVSpan < 0) lp.cellVSpan = mCountY;
 
             child.setId(childId);
-
             mShortcutsAndWidgets.addView(child, index, lp);
+            Log.v(TAG, "addView child.getText = " + ((TextView)child).getText());
 
-            if (markCells) markCellsAsOccupiedForView(child);
+            //if (markCells) markCellsAsOccupiedForView(child);
 
             return true;
         }

@@ -19,6 +19,8 @@ public class Workspace extends SmoothPagedView implements Insettable{
 
     public Workspace(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mLauncher = (Launcher) context;
+
     }
 
     public Workspace(Context context, AttributeSet attrs, int defStyle){
@@ -38,10 +40,12 @@ public class Workspace extends SmoothPagedView implements Insettable{
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-
+        super.onLayout(changed, l, t, r, b);
+        Log.v(TAG, "onLayout l = " + l + "; t = " + t + "; r = " + r + "; b = " + b);
     }
 
     void addInScreenFromBind(View child, long container, long screenId, int x, int y, int spanX, int spanY) {
+        Log.v(TAG, "addInScreenFromBind");
         if (container == Launcher.CONTAINER_DESKTOP) {
             if (getScreenWithId(screenId) == null) {
                 Log.e(TAG, "Skipping child, screenId " + screenId + " not found");
@@ -74,9 +78,22 @@ public class Workspace extends SmoothPagedView implements Insettable{
         // Get the canonical child id to uniquely represent this view in this screen
         ItemInfo info = (ItemInfo) child.getTag();
         int childId = mLauncher.getViewIdForItem(info);
+        Log.v(TAG, "addInScreenFromBind childId = " + childId);
         if (!layout.addViewToCellLayout(child, 0, childId, lp, true)) {
             // TODO: This branch occurs when the workspace is adding views
         }
     }
 
+    public long insertNewWorkspaceScreen(long screenId) {
+        Log.v(TAG, "insertNewWorkspaceScreen screenId = " + screenId);
+        if (mWorkspaceScreens.containsKey(screenId)) {
+            throw new RuntimeException("Screen id " + screenId + " already exists!");
+        }
+        CellLayout newScreen = (CellLayout)
+                mLauncher.getLayoutInflater().inflate(R.layout.workspace_screen, null);
+        mWorkspaceScreens.put(screenId, newScreen);
+        addView(newScreen, getChildCount());
+        Log.v(TAG, "insertNewWorkspaceScreen getChildCount() = " + getChildCount());
+        return screenId;
+    }
 }

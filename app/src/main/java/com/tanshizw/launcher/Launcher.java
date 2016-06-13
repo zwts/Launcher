@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ public class Launcher extends Activity {
     ArrayList<ItemInfo> workspaceItems = new ArrayList<ItemInfo>();
     private HashMap<Integer, Integer> mItemIdToViewId = new HashMap<Integer, Integer>();
     private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
+    ArrayList<Long> orderedScreenIds = new ArrayList<Long>();;
     private LayoutInflater mInflater;
     private static final int ITEMS_CHUNK = 6; // batch size for the workspace icons
     static final int CONTAINER_DESKTOP = -100;
@@ -34,15 +36,23 @@ public class Launcher extends Activity {
      * The gesture is an application created shortcut
      */
     static final int ITEM_TYPE_SHORTCUT = 1;
+    private final String TAG = "Launcher";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
+        Log.v(TAG, "onCreate");
         mInflater = getLayoutInflater();
+        setupViews();
+
+        Long screenId = Long.valueOf(0);
+        orderedScreenIds.add(screenId);
+        orderedScreenIds.add(screenId + 1);//two screens
+        bindAddScreens(orderedScreenIds);
 
         setupWorkspaceItems();
-        setupViews();
+
 /*
         chooseWallpaperBt = (Button)findViewById(R.id.choose_wallpaper);
         chooseWallpaperBt.setOnClickListener(new View.OnClickListener() {
@@ -80,32 +90,61 @@ public class Launcher extends Activity {
     }
 
     private void setupWorkspaceItems(){
-        ItemInfo itemInfoCall = new ItemInfo();
+        ItemInfo itemInfoContact = new ShortcutInfo();
+        itemInfoContact.container = CONTAINER_DESKTOP;
+        itemInfoContact.itemType = ITEM_TYPE_SHORTCUT;
+        itemInfoContact.screenId = 0;
+        itemInfoContact.id = 0;
+        itemInfoContact.cellX = 0;
+        itemInfoContact.cellY = 0;
+        itemInfoContact.spanX = 1;
+        itemInfoContact.spanY = 1;
+        itemInfoContact.title = "Contact";
+
+        ItemInfo itemInfoCall = new ShortcutInfo();
         itemInfoCall.container = CONTAINER_DESKTOP;
         itemInfoCall.itemType = ITEM_TYPE_SHORTCUT;
         itemInfoCall.screenId = 0;
+        itemInfoCall.id = 0;
+        itemInfoCall.cellX = 0;
+        itemInfoCall.cellY = 0;
+        itemInfoCall.spanX = 1;
+        itemInfoCall.spanY = 1;
+        itemInfoCall.title = "Call";
+        workspaceItems.add(itemInfoContact);
         workspaceItems.add(itemInfoCall);
         bindWorkspaceItems(workspaceItems);
+    }
+
+    public void bindAddScreens(ArrayList<Long> orderedScreenIds) {
+        int count = orderedScreenIds.size();
+        for (int i = 0; i < count; i++) {
+            mWorkspace.insertNewWorkspaceScreen(orderedScreenIds.get(i));
+        }
     }
 
     private void bindWorkspaceItems(final ArrayList<ItemInfo> workspaceItems){
         // Bind the workspace items
         int N = workspaceItems.size();
+        Log.v(TAG, "bindWorkspaceItems N = " + N);
         for (int i = 0; i < N; i += ITEMS_CHUNK) {
             final int start = i;
             final int chunkSize = (i+ITEMS_CHUNK <= N) ? ITEMS_CHUNK : (N-i);
-            final Runnable r = new Runnable() {
-                @Override
-                public void run() {
+            Log.v(TAG, "bindWorkspaceItems chunkSize = " + chunkSize);
+            //final Runnable r = new Runnable() {
+            //    @Override
+            //    public void run() {
+                        Log.v(TAG, "bindWorkspaceItems run");
                         bindItems(workspaceItems, start, start+chunkSize, false);
-                    }
-                };
+            //        }
+            //    };
             }
     }
 
     View createShortcut(int layoutResId, ViewGroup parent, ShortcutInfo info) {
+        Log.v(TAG, "createShortcut");
         BubbleTextView favorite = (BubbleTextView) mInflater.inflate(layoutResId, parent, false);
-        favorite.applyFromShortcutInfo(info, true);//mIconCache
+        favorite.applyFromShortcutInfo(info);//mIconCache
         //favorite.setOnClickListener(this);
         //favorite.setOnFocusChangeListener(mFocusHandler);
         return favorite;
@@ -118,6 +157,7 @@ public class Launcher extends Activity {
 
     public void bindItems(final ArrayList<ItemInfo> shortcuts, final int start, final int end,
                           final boolean forceAnimateIcons){
+        Log.v(TAG, "bindItems");
         Workspace workspace = mWorkspace;
         for (int i = start; i < end; i++) {
             final ItemInfo item = shortcuts.get(i);
@@ -156,7 +196,6 @@ public class Launcher extends Activity {
     }
 
     public int getViewIdForItem(ItemInfo info) {
-        // This cast is safe given the > 2B range for int.
         int itemId = (int) info.id;
         if (mItemIdToViewId.containsKey(itemId)) {
             return mItemIdToViewId.get(itemId);
