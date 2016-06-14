@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Launcher</string>
+    <string name="activity_not_found">App isn\'t installed.</string>
 </resources>
