@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PagedView">
+        <attr name="pageIndicator" format="reference" />
+    </declare-styleable>
+    <declare-styleable name="PageIndicator">
+        <attr name="windowSize" format="integer"  />
+    </declare-styleable>
+</resources>

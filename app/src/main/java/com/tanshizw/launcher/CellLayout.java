@@ -52,24 +52,16 @@ public class CellLayout extends ViewGroup {
         }
     }
 
-    public float getChildrenScale() {
-        //return mIsHotseat ? mHotseatScale : 1.0f;
-        return 1.0f;
-    }
-
     public boolean addViewToCellLayout(View child, int index, int childId, LayoutParams params,
                                        boolean markCells) {
         final LayoutParams lp = params;
 
-        // Hotseat icons - remove text
+        // Hotseat icons need remove text
         if (child instanceof BubbleTextView) {
             Log.v(TAG, "addViewToCellLayout BubbleTextView");
             BubbleTextView bubbleChild = (BubbleTextView) child;
             bubbleChild.setTextVisibility(true);
         }
-        Log.v(TAG, "addViewToCellLayout getChildrenScale = " + getChildrenScale());
-        child.setScaleX(getChildrenScale());
-        child.setScaleY(getChildrenScale());
 
         if (lp.cellX >= 0 && lp.cellX <= mCountX - 1 && lp.cellY >= 0 && lp.cellY <= mCountY - 1) {
             if (lp.cellHSpan < 0) lp.cellHSpan = mCountX;
@@ -106,19 +98,14 @@ public class CellLayout extends ViewGroup {
     }
 
     public static class LayoutParams extends ViewGroup.MarginLayoutParams{
-        /**
-         * Horizontal location of the item in the grid.
-         */
         public int cellX;
-
-        /**
-         * Vertical location of the item in the grid.
-         */
         public int cellY;
         //cellHSpan Width in cells
         public int cellHSpan;
         //cellVSpan Height in cells
         public int cellVSpan;
+        public int x;
+        public int y;
 
         public LayoutParams(Context c, AttributeSet attrs) {
             super(c, attrs);
@@ -130,6 +117,18 @@ public class CellLayout extends ViewGroup {
             this.cellY = cellY;
             this.cellHSpan = cellHSpan;
             this.cellVSpan = cellVSpan;
+        }
+
+        public void setup(int cellWidth, int cellHeight, int widthGap, int heightGap) {
+            final int myCellHSpan = cellHSpan;
+            final int myCellVSpan = cellVSpan;
+            int myCellX = cellX;
+            int myCellY = cellY;
+
+            width = myCellHSpan * cellWidth;
+            height = myCellVSpan * cellHeight;
+            x = (int) (myCellX * (cellWidth + widthGap) + leftMargin);
+            y = (int) (myCellY * (cellHeight + heightGap) + topMargin);
         }
     }
 }
