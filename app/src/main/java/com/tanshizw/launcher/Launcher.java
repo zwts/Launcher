@@ -1,7 +1,10 @@
 package com.tanshizw.launcher;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,13 +13,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Launcher extends Activity {
     //private Button chooseWallpaperBt;
     //private Button allApplicationBt;
+    private IconCache mIconCache;
+    private AllAppsList mBgAllAppsList;
+    private LauncherAppsCompat mLauncherApps;
+    private HashMap<Object, CharSequence> mLabelCache;
+    private Context mContext;
+
     DragLayer mDragLayer;
     Workspace mWorkspace;
     ArrayList<ItemInfo> workspaceItems = new ArrayList<ItemInfo>();
@@ -52,69 +65,77 @@ public class Launcher extends Activity {
         bindAddScreens(orderedScreenIds);
 
         setupWorkspaceItems();
-
-/*
-        chooseWallpaperBt = (Button)findViewById(R.id.choose_wallpaper);
-        chooseWallpaperBt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onSetWallpaper();
-            }
-        });
-
-        allApplicationBt = (Button)findViewById(R.id.all_applications);
-        allApplicationBt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                browseAllApplicationsInstalled();
-            }
-        });
-*/
-    }
-
-    public void browseAllApplicationsInstalled() {
-        Intent listApplications = new Intent(this, BrowseAllApplications.class);
-        startActivity(listApplications);
-    }
-
-    public void onSetWallpaper() {
-        final Intent pickWallpaper = new Intent(Intent.ACTION_SET_WALLPAPER);
-        Intent chooser = Intent.createChooser(pickWallpaper, "Choose Wallpaper");
-        startActivity(chooser);
     }
 
     private void setupViews(){
         mDragLayer = (DragLayer) findViewById(R.id.drag_layer);
         mWorkspace = (Workspace) mDragLayer.findViewById(R.id.workspace);
-
     }
 
     private void setupWorkspaceItems(){
-        ItemInfo itemInfoContact = new ShortcutInfo();
-        itemInfoContact.container = CONTAINER_DESKTOP;
-        itemInfoContact.itemType = ITEM_TYPE_SHORTCUT;
-        itemInfoContact.screenId = 0;
-        itemInfoContact.id = 0;
-        itemInfoContact.cellX = 0;
-        itemInfoContact.cellY = 0;
-        itemInfoContact.spanX = 1;
-        itemInfoContact.spanY = 1;
-        itemInfoContact.title = "Contact";
+        mIconCache = new IconCache(this);
+        mBgAllAppsList = new AllAppsList(mIconCache);
+        mLauncherApps = LauncherAppsCompat.getInstance(this);
+        mLabelCache = new HashMap<Object, CharSequence>();
+        mContext = getApplicationContext();
 
-        ItemInfo itemInfoCall = new ShortcutInfo();
-        itemInfoCall.container = CONTAINER_DESKTOP;
-        itemInfoCall.itemType = ITEM_TYPE_SHORTCUT;
-        itemInfoCall.screenId = 0;
-        itemInfoCall.id = 0;
-        itemInfoCall.cellX = 0;
-        itemInfoCall.cellY = 0;
-        itemInfoCall.spanX = 1;
-        itemInfoCall.spanY = 1;
-        itemInfoCall.title = "Call";
-        workspaceItems.add(itemInfoContact);
-        workspaceItems.add(itemInfoCall);
+        List<LauncherActivityInfoCompat> apps = mLauncherApps.getActivityList(null);
+        if (apps == null || apps.isEmpty()) {
+            return;
+        }
+
+        Collections.sort(apps, new ShortcutNameComparator(mLabelCache));
+
+        for (int i = 0; i < apps.size(); i++) {
+            LauncherActivityInfoCompat app = apps.get(i);
+            // This builds the icon bitmaps.
+            mBgAllAppsList.add(new AppInfo(mContext, app, mIconCache, mLabelCache));
+        }
+
+        for (int i = 0; i < 3; i++) {
+            AppInfo app = mBgAllAppsList.get(i);
+            ShortcutInfo shortcut = new ShortcutInfo(app);
+            shortcut.container = CONTAINER_DESKTOP;
+            shortcut.itemType = ITEM_TYPE_SHORTCUT;
+            shortcut.screenId = 0;
+            shortcut.id = 0;
+            shortcut.cellX = 0;
+            shortcut.cellY = 0;
+            shortcut.spanX = 1;
+            shortcut.spanY = 1;
+            workspaceItems.add(shortcut);
+        }
         bindWorkspaceItems(workspaceItems);
     }
+
+    public static class ShortcutNameComparator implements Comparator<LauncherActivityInfoCompat> {
+        private Collator mCollator;
+        private HashMap<Object, CharSequence> mLabelCache;
+        ShortcutNameComparator(HashMap<Object, CharSequence> labelCache) {
+            mLabelCache = labelCache;
+            mCollator = Collator.getInstance();
+        }
+        public final int compare(LauncherActivityInfoCompat a, LauncherActivityInfoCompat b) {
+            String labelA, labelB;
+            ComponentName keyA = a.getComponentName();
+            ComponentName keyB = b.getComponentName();
+            if (mLabelCache.containsKey(keyA)) {
+                labelA = mLabelCache.get(keyA).toString();
+            } else {
+                labelA = a.getLabel().toString().trim();
+
+                mLabelCache.put(keyA, labelA);
+            }
+            if (mLabelCache.containsKey(keyB)) {
+                labelB = mLabelCache.get(keyB).toString();
+            } else {
+                labelB = b.getLabel().toString().trim();
+
+                mLabelCache.put(keyB, labelB);
+            }
+            return mCollator.compare(labelA, labelB);
+        }
+    };
 
     public void bindAddScreens(ArrayList<Long> orderedScreenIds) {
         int count = orderedScreenIds.size();
@@ -144,7 +165,7 @@ public class Launcher extends Activity {
     View createShortcut(int layoutResId, ViewGroup parent, ShortcutInfo info) {
         Log.v(TAG, "createShortcut");
         BubbleTextView favorite = (BubbleTextView) mInflater.inflate(layoutResId, parent, false);
-        favorite.applyFromShortcutInfo(info);//mIconCache
+        favorite.applyFromShortcutInfo(info, mIconCache, true);
         //favorite.setOnClickListener(this);
         //favorite.setOnFocusChangeListener(mFocusHandler);
         return favorite;
