@@ -66,8 +66,11 @@ public class Workspace extends SmoothPagedView implements Insettable{
         ViewGroup.LayoutParams genericLp = child.getLayoutParams();
         CellLayout.LayoutParams lp;
         if (genericLp == null || !(genericLp instanceof CellLayout.LayoutParams)) {
+            Log.v(TAG, "Layout is not CellLayout.LayoutParams");
             lp = new CellLayout.LayoutParams(x, y, spanX, spanY);
+            lp.setup(100, 100, 20, 20);
         } else {
+            Log.v(TAG, "Layout is CellLayout.LayoutParams");
             lp = (CellLayout.LayoutParams) genericLp;
             lp.cellX = x;
             lp.cellY = y;

@@ -152,13 +152,14 @@ public class Launcher extends Activity {
             final int start = i;
             final int chunkSize = (i+ITEMS_CHUNK <= N) ? ITEMS_CHUNK : (N-i);
             Log.v(TAG, "bindWorkspaceItems chunkSize = " + chunkSize);
-            //final Runnable r = new Runnable() {
-            //    @Override
-            //    public void run() {
+            final Runnable r = new Runnable() {
+                @Override
+                public void run() {
                         Log.v(TAG, "bindWorkspaceItems run");
-                        bindItems(workspaceItems, start, start+chunkSize, false);
-            //        }
-            //    };
+                        bindItems(workspaceItems, start, start+chunkSize);
+                    }
+                };
+            r.run();
             }
     }
 
@@ -176,8 +177,7 @@ public class Launcher extends Activity {
                 (ViewGroup) mWorkspace.getChildAt(mWorkspace.getCurrentPage()), info);
     }
 
-    public void bindItems(final ArrayList<ItemInfo> shortcuts, final int start, final int end,
-                          final boolean forceAnimateIcons){
+    public void bindItems(final ArrayList<ItemInfo> shortcuts, final int start, final int end){
         Log.v(TAG, "bindItems");
         Workspace workspace = mWorkspace;
         for (int i = start; i < end; i++) {
@@ -189,7 +189,7 @@ public class Launcher extends Activity {
                     ShortcutInfo info = (ShortcutInfo) item;
                     View shortcut = createShortcut(info);//BubbleTextView
                     workspace.addInScreenFromBind(shortcut, item.container, item.screenId, item.cellX,
-                            item.cellY, 1, 1);
+                            item.cellY, item.spanX, item.spanY);
                     workspace.requestLayout();
                     break;
                 default:
@@ -224,5 +224,11 @@ public class Launcher extends Activity {
         int viewId = generateViewId();
         mItemIdToViewId.put(itemId, viewId);
         return viewId;
+    }
+
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        Log.v(TAG, "onAttachedToWindow");
     }
 }

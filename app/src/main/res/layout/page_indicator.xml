@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.tanshizw.launcher.view.PageIndicator
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:launcher="http://schemas.android.com/apk/res-auto"
+    android:animateLayoutChanges="true"
+    launcher:windowSize="21"
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content">
+</com.tanshizw.launcher.view.PageIndicator>
