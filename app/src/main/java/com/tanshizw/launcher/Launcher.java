@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
+import com.tanshizw.launcher.Utility.LauncherSettings;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -35,22 +36,14 @@ public class Launcher extends Activity implements View.OnClickListener {
 
     DragLayer mDragLayer;
     Workspace mWorkspace;
+    Hotseat mHotseat;
     ArrayList<ItemInfo> workspaceItems = new ArrayList<ItemInfo>();
     private HashMap<Integer, Integer> mItemIdToViewId = new HashMap<Integer, Integer>();
     private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
-    ArrayList<Long> orderedScreenIds = new ArrayList<Long>();;
+    ArrayList<Long> orderedScreenIds = new ArrayList<Long>();
+    ;
     private LayoutInflater mInflater;
-    private static final int ITEMS_CHUNK = 6; // batch size for the workspace icons
-    static final int CONTAINER_DESKTOP = -100;
-    static final int CONTAINER_HOTSEAT = -101;
-    /**
-     * The gesture is an application
-     */
     static final int ITEM_TYPE_APPLICATION = 0;
-
-    /**
-     * The gesture is an application created shortcut
-     */
     static final int ITEM_TYPE_SHORTCUT = 1;
     private final String TAG = "Launcher";
 
@@ -70,15 +63,18 @@ public class Launcher extends Activity implements View.OnClickListener {
         orderedScreenIds.add(screenId + 1);//two screens
         bindAddScreens(orderedScreenIds);
 
+        addHotseatLayout();
+
         setupWorkspaceItems();
     }
 
-    private void setupViews(){
+    private void setupViews() {
         mDragLayer = (DragLayer) findViewById(R.id.drag_layer);
         mWorkspace = (Workspace) mDragLayer.findViewById(R.id.workspace);
+        mHotseat = (Hotseat) mDragLayer.findViewById(R.id.hot_seat);
     }
 
-    private void setupWorkspaceItems(){
+    private void setupWorkspaceItems() {
         mIconCache = new IconCache(this);
         mBgAllAppsList = new AllAppsList(mIconCache);
         mLauncherApps = LauncherAppsCompat.getInstance(this);
@@ -101,7 +97,11 @@ public class Launcher extends Activity implements View.OnClickListener {
         for (int i = 0; i < 3; i++) {
             AppInfo app = mBgAllAppsList.get(i);
             ShortcutInfo shortcut = new ShortcutInfo(app);
-            shortcut.container = CONTAINER_DESKTOP;
+            if (i == 2) {
+                shortcut.container = LauncherSettings.CONTAINER_HOTSEAT;
+            } else {
+                shortcut.container = LauncherSettings.CONTAINER_DESKTOP;
+            }
             shortcut.itemType = ITEM_TYPE_SHORTCUT;
             shortcut.screenId = 0;
             shortcut.id = 0;
@@ -117,10 +117,12 @@ public class Launcher extends Activity implements View.OnClickListener {
     public static class ShortcutNameComparator implements Comparator<LauncherActivityInfoCompat> {
         private Collator mCollator;
         private HashMap<Object, CharSequence> mLabelCache;
+
         ShortcutNameComparator(HashMap<Object, CharSequence> labelCache) {
             mLabelCache = labelCache;
             mCollator = Collator.getInstance();
         }
+
         public final int compare(LauncherActivityInfoCompat a, LauncherActivityInfoCompat b) {
             String labelA, labelB;
             ComponentName keyA = a.getComponentName();
@@ -141,7 +143,9 @@ public class Launcher extends Activity implements View.OnClickListener {
             }
             return mCollator.compare(labelA, labelB);
         }
-    };
+    }
+
+    ;
 
     public void bindAddScreens(ArrayList<Long> orderedScreenIds) {
         int count = orderedScreenIds.size();
@@ -150,23 +154,28 @@ public class Launcher extends Activity implements View.OnClickListener {
         }
     }
 
-    private void bindWorkspaceItems(final ArrayList<ItemInfo> workspaceItems){
+    public void addHotseatLayout() {
+        mHotseat.insertHotseatLayout();
+    }
+
+    private void bindWorkspaceItems(final ArrayList<ItemInfo> workspaceItems) {
         // Bind the workspace items
         int N = workspaceItems.size();
+        int itemschunk = LauncherSettings.ITEMS_CHUNK;
         Log.v(TAG, "bindWorkspaceItems N = " + N);
-        for (int i = 0; i < N; i += ITEMS_CHUNK) {
+        for (int i = 0; i < N; i += itemschunk) {
             final int start = i;
-            final int chunkSize = (i+ITEMS_CHUNK <= N) ? ITEMS_CHUNK : (N-i);
+            final int chunkSize = (i + itemschunk <= N) ? itemschunk : (N - i);
             Log.v(TAG, "bindWorkspaceItems chunkSize = " + chunkSize);
             final Runnable r = new Runnable() {
                 @Override
                 public void run() {
-                        Log.v(TAG, "bindWorkspaceItems run");
-                        bindItems(workspaceItems, start, start+chunkSize);
-                    }
-                };
+                    Log.v(TAG, "bindWorkspaceItems run");
+                    bindItems(workspaceItems, start, start + chunkSize);
+                }
+            };
             r.run();
-            }
+        }
     }
 
     View createShortcut(int layoutResId, ViewGroup parent, ShortcutInfo info) {
@@ -183,20 +192,19 @@ public class Launcher extends Activity implements View.OnClickListener {
                 (ViewGroup) mWorkspace.getChildAt(mWorkspace.getCurrentPage()), info);
     }
 
-    public void bindItems(final ArrayList<ItemInfo> shortcuts, final int start, final int end){
+    public void bindItems(final ArrayList<ItemInfo> shortcuts, final int start, final int end) {
         Log.v(TAG, "bindItems");
-        Workspace workspace = mWorkspace;
         for (int i = start; i < end; i++) {
             final ItemInfo item = shortcuts.get(i);
 
-            switch (item.itemType){
+            switch (item.itemType) {
                 case ITEM_TYPE_APPLICATION:
                 case ITEM_TYPE_SHORTCUT:
                     ShortcutInfo info = (ShortcutInfo) item;
                     View shortcut = createShortcut(info);//BubbleTextView
-                    workspace.addInScreenFromBind(shortcut, item.container, item.screenId, item.cellX,
+                    mWorkspace.addInScreenFromBind(shortcut, item.container, item.screenId, item.cellX,
                             item.cellY, item.spanX, item.spanY);
-                    workspace.requestLayout();
+
                     break;
                 default:
                     break;
@@ -210,7 +218,7 @@ public class Launcher extends Activity implements View.OnClickListener {
         } else {
             // View.generateViewId() is not available. The following fallback logic is a copy
             // of its implementation.
-            for (;;) {
+            for (; ; ) {
                 final int result = sNextGeneratedId.get();
                 // aapt-generated IDs have the high byte nonzero; clamp to the range under that.
                 int newValue = result + 1;
@@ -334,8 +342,12 @@ public class Launcher extends Activity implements View.OnClickListener {
             Log.e(TAG, "Launcher does not have the permission to launch " + intent +
                     ". Make sure to create a MAIN intent-filter for the corresponding activity " +
                     "or use the exported attribute for this activity. "
-                    + "tag="+ tag + " intent=" + intent, e);
+                    + "tag=" + tag + " intent=" + intent, e);
         }
         return false;
+    }
+
+    public Hotseat getHotseat() {
+        return mHotseat;
     }
 }

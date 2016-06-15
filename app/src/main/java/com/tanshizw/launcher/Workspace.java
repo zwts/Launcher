@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.tanshizw.launcher.Utility.LauncherSettings;
+
 import java.util.HashMap;
 
 /**
@@ -46,7 +48,7 @@ public class Workspace extends SmoothPagedView implements Insettable{
 
     void addInScreenFromBind(View child, long container, long screenId, int x, int y, int spanX, int spanY) {
         Log.v(TAG, "addInScreenFromBind");
-        if (container == Launcher.CONTAINER_DESKTOP) {
+        if (container == LauncherSettings.CONTAINER_DESKTOP) {
             if (getScreenWithId(screenId) == null) {
                 Log.e(TAG, "Skipping child, screenId " + screenId + " not found");
                 // DEBUGGING - Print out the stack trace to see where we are adding from
@@ -56,10 +58,10 @@ public class Workspace extends SmoothPagedView implements Insettable{
         }
 
         CellLayout layout = null;
-        if (container == Launcher.CONTAINER_HOTSEAT) {
-            //// TODO: 6/8/16  
+        if (container == LauncherSettings.CONTAINER_HOTSEAT) {
+            layout = mLauncher.getHotseat().getLayout();
+            Log.v(TAG, "layout = " + layout);
         } else {
-            //// TODO: 6/8/16
             layout = getScreenWithId(screenId);
         }
 
