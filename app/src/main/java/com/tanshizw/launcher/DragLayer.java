@@ -1,15 +1,13 @@
 package com.tanshizw.launcher;
 
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.tanshizw.launcher.Utility.LauncherSettings;
 import com.tanshizw.launcher.view.PageIndicator;
 
 /**
@@ -18,11 +16,6 @@ import com.tanshizw.launcher.view.PageIndicator;
 public class DragLayer extends FrameLayout implements ViewGroup.OnHierarchyChangeListener{
 
     private static final String TAG = "DragLayer";
-    private final Rect mInsets = new Rect();
-
-    private final int WORKSPACE_HEIGHT = 1000;
-    private final int WORKSPACE_TOPPADDING = 10;
-    private final int PAGEINDICATOR_HEIGHT = 50;
 
     public DragLayer(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -36,11 +29,22 @@ public class DragLayer extends FrameLayout implements ViewGroup.OnHierarchyChang
             View child = getChildAt(i);
             if (child instanceof Workspace) {
                 Log.v(TAG, "onLayout workspace");
-                child.layout(l, t + WORKSPACE_TOPPADDING, r, WORKSPACE_HEIGHT);
+                int x = l;
+                int y = t + LauncherSettings.WORKSPACE_TOPPADDING;
+                child.layout(x, y, x + r, y + LauncherSettings.WORKSPACE_HEIGHT);
             }
             if (child instanceof PageIndicator) {
                 Log.v(TAG, "onLayout PageIndicator");
-                child.layout(r / 2, t + WORKSPACE_HEIGHT, r, PAGEINDICATOR_HEIGHT + WORKSPACE_HEIGHT);
+                int x = r / 2;
+                int y = t + LauncherSettings.WORKSPACE_HEIGHT + LauncherSettings.WORKSPACE_TOPPADDING;
+                child.layout(x, y, x + r, y + LauncherSettings.PAGEINDICATOR_HEIGHT);
+            }
+            if(child instanceof Hotseat){
+                Log.v(TAG, "onLayout Hotseat");
+                int x = l;
+                int y = t + LauncherSettings.WORKSPACE_HEIGHT + LauncherSettings.WORKSPACE_TOPPADDING
+                        + LauncherSettings.PAGEINDICATOR_HEIGHT + LauncherSettings.PAGEINDICATOR_PADDING;
+                child.layout(x, y, x + r, y + LauncherSettings.HOTSEAT_HEIGHT);
             }
         }
     }

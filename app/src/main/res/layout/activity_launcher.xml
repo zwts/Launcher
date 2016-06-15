@@ -24,11 +24,13 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:layout_gravity="center_horizontal" />
-<!--
+
         <include
             layout="@layout/hot_seat"
-            android:id="@+id/hot_seat" />
--->
+            android:id="@+id/hot_seat"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"/>
 
     </com.tanshizw.launcher.DragLayer>
 </FrameLayout>
