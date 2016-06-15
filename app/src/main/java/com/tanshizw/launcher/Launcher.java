@@ -1,10 +1,13 @@
 package com.tanshizw.launcher;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -21,14 +25,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Launcher extends Activity {
-    //private Button chooseWallpaperBt;
-    //private Button allApplicationBt;
+public class Launcher extends Activity implements View.OnClickListener {
     private IconCache mIconCache;
     private AllAppsList mBgAllAppsList;
     private LauncherAppsCompat mLauncherApps;
     private HashMap<Object, CharSequence> mLabelCache;
     private Context mContext;
+    private boolean mIsSafeModeEnabled;
 
     DragLayer mDragLayer;
     Workspace mWorkspace;
@@ -56,7 +59,10 @@ public class Launcher extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
         Log.v(TAG, "onCreate");
+
         mInflater = getLayoutInflater();
+        mIsSafeModeEnabled = getPackageManager().isSafeMode();
+
         setupViews();
 
         Long screenId = Long.valueOf(0);
@@ -167,7 +173,7 @@ public class Launcher extends Activity {
         Log.v(TAG, "createShortcut");
         BubbleTextView favorite = (BubbleTextView) mInflater.inflate(layoutResId, parent, false);
         favorite.applyFromShortcutInfo(info, mIconCache, true);
-        //favorite.setOnClickListener(this);
+        favorite.setOnClickListener(this);
         //favorite.setOnFocusChangeListener(mFocusHandler);
         return favorite;
     }
@@ -230,5 +236,106 @@ public class Launcher extends Activity {
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
         Log.v(TAG, "onAttachedToWindow");
+    }
+
+    public void onClick(View v) {
+        if (v instanceof Workspace) {
+            //TODO: workspace over view mode
+            return;
+        }
+
+        if (v instanceof CellLayout) {
+            //TODO: workspace over view mode
+        }
+
+        Object tag = v.getTag();
+
+        if (tag instanceof ShortcutInfo) {
+            onClickAppShortcut(v);
+        } else if (tag instanceof AppInfo) {
+            startAppShortcutOrInfoActivity(v);
+        } else {
+            //TODO: FolderIcon and PendingWidget onclick
+        }
+    }
+
+    /**
+     * Event handler for an app shortcut click.
+     *
+     * @param v The view that was clicked. Must be a tagged with a {@link ShortcutInfo}.
+     */
+    protected void onClickAppShortcut(final View v) {
+        Log.d(TAG, "onClickAppShortcut");
+        Object tag = v.getTag();
+        if (!(tag instanceof ShortcutInfo)) {
+            throw new IllegalArgumentException("Input must be a Shortcut");
+        }
+
+        // Open shortcut
+        final ShortcutInfo shortcut = (ShortcutInfo) tag;
+        final Intent intent = shortcut.intent;
+
+        // Start activities
+        startAppShortcutOrInfoActivity(v);
+    }
+
+    private void startAppShortcutOrInfoActivity(View v) {
+        Object tag = v.getTag();
+        final ShortcutInfo shortcut;
+        final Intent intent;
+        if (tag instanceof ShortcutInfo) {
+            shortcut = (ShortcutInfo) tag;
+            intent = shortcut.intent;
+            int[] pos = new int[2];
+            v.getLocationOnScreen(pos);
+            intent.setSourceBounds(new Rect(pos[0], pos[1],
+                    pos[0] + v.getWidth(), pos[1] + v.getHeight()));
+        } else if (tag instanceof AppInfo) {
+            shortcut = null;
+            intent = ((AppInfo) tag).intent;
+        } else {
+            throw new IllegalArgumentException("Input must be a Shortcut or AppInfo");
+        }
+
+        boolean success = startActivitySafely(v, intent, tag);
+        if (success && v instanceof BubbleTextView) {
+            //TODO: when success do something show the icon shadow
+        }
+    }
+
+    boolean startActivitySafely(View v, Intent intent, Object tag) {
+        boolean success = false;
+        if (mIsSafeModeEnabled && !Utilities.isSystemApp(this, intent)) {
+            Toast.makeText(this, R.string.safemode_shortcut_error, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        try {
+            success = startActivity(v, intent, tag);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Unable to launch. tag=" + tag + " intent=" + intent, e);
+        }
+        return success;
+    }
+
+    boolean startActivity(View v, Intent intent, Object tag) {
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        try {
+            // Only launch using the new animation if the shortcut has not opted out (this is a
+            // private contract between launcher and may be ignored in the future).
+            LauncherAppsCompat launcherApps = LauncherAppsCompat.getInstance(this);
+            Bundle optsBundle = null;
+
+            launcherApps.startActivityForProfile(intent.getComponent(), intent.getSourceBounds(),
+                    optsBundle);
+            return true;
+        } catch (SecurityException e) {
+            Toast.makeText(this, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Launcher does not have the permission to launch " + intent +
+                    ". Make sure to create a MAIN intent-filter for the corresponding activity " +
+                    "or use the exported attribute for this activity. "
+                    + "tag="+ tag + " intent=" + intent, e);
+        }
+        return false;
     }
 }

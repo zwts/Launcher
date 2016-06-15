@@ -99,25 +99,6 @@ public class IconCache {
                 entry.icon = Utilities.createIconBitmap(
                         info.getBadgedIcon(mIconDpi), mContext);
             }
-/*            else {
-                entry.title = "";
-                Bitmap preloaded = getPreloadedIcon(componentName);
-                if (preloaded != null) {
-                    entry.icon = preloaded;
-                } else {
-                    if (usePackageIcon) {
-                        CacheEntry packageEntry = getEntryForPackage(
-                                componentName.getPackageName());
-                        if (packageEntry != null) {
-                            entry.icon = packageEntry.icon;
-                            entry.title = packageEntry.title;
-                        }
-                    }
-                    if (entry.icon == null) {
-                       *//* entry.icon = getDefaultIcon(user);*//*
-                    }
-                }
-            }*/
         }
         return entry;
     }

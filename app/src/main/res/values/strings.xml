@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Launcher</string>
     <string name="activity_not_found">App isn\'t installed.</string>
+    <!-- SafeMode shortcut error string -->
+    <string name="safemode_shortcut_error">Downloaded app disabled in Safe mode</string>
 </resources>
