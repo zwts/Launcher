@@ -99,7 +99,7 @@ public class Launcher extends Activity {
             shortcut.itemType = ITEM_TYPE_SHORTCUT;
             shortcut.screenId = 0;
             shortcut.id = 0;
-            shortcut.cellX = 0;
+            shortcut.cellX = 0 + i;
             shortcut.cellY = 0;
             shortcut.spanX = 1;
             shortcut.spanY = 1;

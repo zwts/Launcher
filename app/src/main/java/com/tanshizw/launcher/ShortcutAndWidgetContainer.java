@@ -18,11 +18,12 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        for(int i = 0; i < getChildCount(); i++){
-            View child = getChildAt(i);
+        int count = getChildCount();
+        for(int i = 0; i < count; i++){
+            View child = getChildAt(count - i - 1);
             CellLayout.LayoutParams params = (CellLayout.LayoutParams) child.getLayoutParams();
             Log.v(TAG, "onLayout l = " + params.x + "; t = " + params.y + "; r = " + params.width + "; b = " + params.height);
-            child.layout(params.x, params.y, params.width, params.height);
+            child.layout(params.x, params.y, params.x + params.width, params.y + params.height);
         }
     }
 }
