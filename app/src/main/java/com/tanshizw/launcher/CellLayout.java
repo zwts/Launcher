@@ -8,15 +8,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import com.tanshizw.launcher.Utility.LauncherSettings;
 
 /**
  * Created by user on 6/6/16.
  */
 public class CellLayout extends ViewGroup {
-    private int mCountX = 6;//mCountX cells in horizental
-    private int mCountY = 6;//mCountY cells in vertical
-    private int mCellWidth = 100;
+    private int mCountX;
+    private int mCountY;
     boolean[][] mOccupied;
     private ShortcutAndWidgetContainer mShortcutsAndWidgets;
     private final String TAG = "CellLayout";
@@ -24,6 +23,8 @@ public class CellLayout extends ViewGroup {
     public CellLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         Log.v(TAG, "CellLayout");
+        mCountX = LauncherSettings.mCountX;
+        mCountY = LauncherSettings.mCountY;
         mOccupied = new boolean[mCountX][mCountY];
         mShortcutsAndWidgets = new ShortcutAndWidgetContainer(context, attrs);
         addView(mShortcutsAndWidgets);
