@@ -31,6 +31,10 @@ public class AllAppsList {
         return data.get(index);
     }
 
+    public int size() {
+        return data.size();
+    }
+
     public void clear() {
         data.clear();
     }

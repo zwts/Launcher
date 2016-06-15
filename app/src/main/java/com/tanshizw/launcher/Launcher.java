@@ -94,7 +94,7 @@ public class Launcher extends Activity implements View.OnClickListener {
             mBgAllAppsList.add(new AppInfo(mContext, app, mIconCache, mLabelCache));
         }
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < mBgAllAppsList.size(); i++) {
             AppInfo app = mBgAllAppsList.get(i);
             ShortcutInfo shortcut = new ShortcutInfo(app);
             if (i == 2) {
@@ -105,11 +105,12 @@ public class Launcher extends Activity implements View.OnClickListener {
             shortcut.itemType = ITEM_TYPE_SHORTCUT;
             shortcut.screenId = 0;
             shortcut.id = 0;
-            shortcut.cellX = 0 + i;
-            shortcut.cellY = 0;
+            shortcut.cellX = i % 6;
+            shortcut.cellY = i / 6;
             shortcut.spanX = 1;
             shortcut.spanY = 1;
             workspaceItems.add(shortcut);
+            Log.v(TAG, "shortcut.cellX = " + shortcut.cellX +  "shortcut.cellY = " + shortcut.cellY);
         }
         bindWorkspaceItems(workspaceItems);
     }
