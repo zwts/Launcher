@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class PageIndicator extends LinearLayout {
     private static final String TAG = "PageIndicator";
     private ArrayList<PageIndicatorMarker> mMarkers = new ArrayList<PageIndicatorMarker>();
-    private int mActiveMarkerIndex = 1;
+    private int mActiveMarkerIndex = 0;
     private LayoutInflater mLayoutInflater;
 
     public PageIndicator(Context context) {
@@ -29,19 +29,8 @@ public class PageIndicator extends LinearLayout {
         mLayoutInflater = LayoutInflater.from(context);
     }
 
-    public static class PageMarkerResources {
-        int activeId;
-        int inactiveId;
-
-        public PageMarkerResources() {
-            activeId = R.drawable.ic_pageindicator_current;
-            inactiveId = R.drawable.ic_pageindicator_default;
-        }
-
-        public PageMarkerResources(int aId, int iaId) {
-            activeId = aId;
-            inactiveId = iaId;
-        }
+    public void setActiveMarkerIndex(int index){
+        mActiveMarkerIndex = index;
     }
 
     public void offsetWindowCenterTo() {

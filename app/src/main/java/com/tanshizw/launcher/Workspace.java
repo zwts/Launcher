@@ -42,8 +42,16 @@ public class Workspace extends SmoothPagedView implements Insettable{
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        super.onLayout(changed, l, t, r, b);
+        //super.onLayout(changed, l, t, r, b);
         Log.v(TAG, "onLayout l = " + l + "; t = " + t + "; r = " + r + "; b = " + b);
+        int count = getChildCount();
+        int x = l;
+        int y = t;
+        for(int i = 0; i < count; i++){
+            View child = (View)getChildAt(i);
+            child.layout(x, y, x + r, y + b);
+            x = x + r;
+        }
     }
 
     void addInScreenFromBind(View child, long container, long screenId, int x, int y, int spanX, int spanY) {
@@ -70,7 +78,8 @@ public class Workspace extends SmoothPagedView implements Insettable{
         if (genericLp == null || !(genericLp instanceof CellLayout.LayoutParams)) {
             Log.v(TAG, "Layout is not CellLayout.LayoutParams");
             lp = new CellLayout.LayoutParams(x, y, spanX, spanY);
-            lp.setup(100, 100, 20, 20);
+            lp.setup(LauncherSettings.ICON_WIDTH, LauncherSettings.ICON_HEIGHT,
+                    LauncherSettings.ICON_PADDING, LauncherSettings.ICON_PADDING);
         } else {
             Log.v(TAG, "Layout is CellLayout.LayoutParams");
             lp = (CellLayout.LayoutParams) genericLp;
@@ -100,5 +109,9 @@ public class Workspace extends SmoothPagedView implements Insettable{
         addView(newScreen, getChildCount());
         Log.v(TAG, "insertNewWorkspaceScreen getChildCount() = " + getChildCount());
         return screenId;
+    }
+
+    protected void onPageBeginMoving() {
+
     }
 }
