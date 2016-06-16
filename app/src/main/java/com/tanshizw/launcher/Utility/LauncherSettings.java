@@ -13,15 +13,21 @@ final public class LauncherSettings {
     //display in hotseat
     public static final int CONTAINER_HOTSEAT = -101;
     //workspace height
-    public static final int WORKSPACE_HEIGHT = 1000;
+    public static final int WORKSPACE_HEIGHT = 960;
     //workspace padding top
-    public static final int WORKSPACE_TOPPADDING = 10;
+    public static final int WORKSPACE_TOPPADDING = 50;
     //pageindicator height
     public static final int PAGEINDICATOR_HEIGHT = 50;
     //pageindicator padding workspace
     public static final int PAGEINDICATOR_PADDING = 20;
     //hotseat height
     public static final int HOTSEAT_HEIGHT = 100;
+    //icon width
+    public static final int ICON_WIDTH = 130;
+    //icon height
+    public static final int ICON_HEIGHT = 130;
+    //icon padding
+    public static final int ICON_PADDING = 0;
     //mCountX cells in horizental
     public static final int mCountX = 6;
     //mCountY cells in vertical
