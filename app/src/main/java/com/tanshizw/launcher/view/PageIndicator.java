@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -31,6 +32,14 @@ public class PageIndicator extends LinearLayout {
 
     public void setActiveMarkerIndex(int index){
         mActiveMarkerIndex = index;
+        for (int i = 0; i < mMarkers.size(); ++i) {
+            PageIndicatorMarker marker = (PageIndicatorMarker) mMarkers.get(i);
+            if (i == mActiveMarkerIndex) {
+                marker.activate();
+            }else{
+                marker.inactivate();
+            }
+        }
     }
 
     public void offsetWindowCenterTo() {

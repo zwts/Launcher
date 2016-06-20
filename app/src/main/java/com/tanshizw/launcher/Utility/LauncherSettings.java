@@ -32,6 +32,14 @@ final public class LauncherSettings {
     public static final int mCountX = 6;
     //mCountY cells in vertical
     public static final int mCountY = 6;
+    //slide the page deltaX gap
+    public static final int SLIDE_PAGE_DELTAX = 50;
+    //screen width
+    public static int SCREEN_WIDTH;
+    //screen height
+    public static int SCREEN_HEIGHT;
+    //snap screen gap
+    public static int SNAP_SCREEN_GAP = 200;
     //hotset applications
     public static final String[] HOTSET_APPS = {
             "com.android.dialer",

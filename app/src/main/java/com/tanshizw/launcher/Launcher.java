@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,7 +42,6 @@ public class Launcher extends Activity implements View.OnClickListener {
     private HashMap<Integer, Integer> mItemIdToViewId = new HashMap<Integer, Integer>();
     private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
     ArrayList<Long> orderedScreenIds = new ArrayList<Long>();
-    ;
     private LayoutInflater mInflater;
     static final int ITEM_TYPE_APPLICATION = 0;
     static final int ITEM_TYPE_SHORTCUT = 1;
@@ -55,6 +55,11 @@ public class Launcher extends Activity implements View.OnClickListener {
 
         mInflater = getLayoutInflater();
         mIsSafeModeEnabled = getPackageManager().isSafeMode();
+
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        LauncherSettings.SCREEN_WIDTH = dm.widthPixels;
+        LauncherSettings.SCREEN_HEIGHT = dm.heightPixels;
 
         setupViews();
 
@@ -251,11 +256,8 @@ public class Launcher extends Activity implements View.OnClickListener {
         if (Build.VERSION.SDK_INT >= 17) {
             return View.generateViewId();
         } else {
-            // View.generateViewId() is not available. The following fallback logic is a copy
-            // of its implementation.
             for (; ; ) {
                 final int result = sNextGeneratedId.get();
-                // aapt-generated IDs have the high byte nonzero; clamp to the range under that.
                 int newValue = result + 1;
                 if (newValue > 0x00FFFFFF) newValue = 1; // Roll over to 1, not 0.
                 if (sNextGeneratedId.compareAndSet(result, newValue)) {
