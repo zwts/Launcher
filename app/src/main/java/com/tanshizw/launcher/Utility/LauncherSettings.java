@@ -1,5 +1,7 @@
 package com.tanshizw.launcher.Utility;
 
+import java.lang.reflect.Array;
+
 /**
  * Created by user on 6/15/16.
  */
@@ -38,4 +40,13 @@ final public class LauncherSettings {
     public static int SCREEN_HEIGHT;
     //snap screen gap
     public static int SNAP_SCREEN_GAP = 200;
+    //hotset applications
+    public static final String[] HOTSET_APPS = {
+            "com.android.dialer",
+            "com.android.mms",
+            "com.android.contacts",
+            "com.android.browser",
+            "com.android.email",
+            "com.android.settings"
+    };
 }

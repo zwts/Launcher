@@ -80,6 +80,8 @@ public class Launcher extends Activity implements View.OnClickListener {
     }
 
     private void setupWorkspaceItems() {
+        int hotseatAppNum = 0;
+        int desktopAppNum = 0;
         mIconCache = new IconCache(this);
         mBgAllAppsList = new AllAppsList(mIconCache);
         mLauncherApps = LauncherAppsCompat.getInstance(this);
@@ -100,24 +102,56 @@ public class Launcher extends Activity implements View.OnClickListener {
         }
 
         for (int i = 0; i < mBgAllAppsList.size(); i++) {
-            AppInfo app = mBgAllAppsList.get(i);
-            ShortcutInfo shortcut = new ShortcutInfo(app);
-            if (i == 2) {
-                shortcut.container = LauncherSettings.CONTAINER_HOTSEAT;
+            AppInfo info = mBgAllAppsList.get(i);
+            if (isHotseatApp(info)) {
+                applyHotseatApps(info, hotseatAppNum);
+                hotseatAppNum ++;
             } else {
-                shortcut.container = LauncherSettings.CONTAINER_DESKTOP;
+                applyDesktopApps(info, desktopAppNum);
+                desktopAppNum ++;
             }
+        }
+
+        bindWorkspaceItems(workspaceItems);
+    }
+
+    private void applyHotseatApps(AppInfo info, int i) {
+            ShortcutInfo shortcut = new ShortcutInfo(info);
+
+            shortcut.container = LauncherSettings.CONTAINER_HOTSEAT;
             shortcut.itemType = ITEM_TYPE_SHORTCUT;
             shortcut.screenId = 0;
             shortcut.id = 0;
-            shortcut.cellX = i % 6;
-            shortcut.cellY = i / 6;
+            shortcut.cellX = i;
+            shortcut.cellY = 0;
             shortcut.spanX = 1;
             shortcut.spanY = 1;
             workspaceItems.add(shortcut);
-            Log.v(TAG, "shortcut.cellX = " + shortcut.cellX +  "shortcut.cellY = " + shortcut.cellY);
+    }
+
+    private void applyDesktopApps(AppInfo info, int i) {
+            ShortcutInfo shortcut = new ShortcutInfo(info);
+
+            shortcut.container = LauncherSettings.CONTAINER_DESKTOP;
+            shortcut.itemType = ITEM_TYPE_SHORTCUT;
+            shortcut.screenId = 0;
+            shortcut.id = 0;
+            shortcut.cellX = i % LauncherSettings.mCountX;
+            shortcut.cellY = i / LauncherSettings.mCountX;
+            shortcut.spanX = 1;
+            shortcut.spanY = 1;
+            workspaceItems.add(shortcut);
+    }
+
+    private boolean isHotseatApp(AppInfo info) {
+        final ComponentName component = info.intent.getComponent();
+        String packageName = component.getPackageName();
+        for(int i = 0; i < LauncherSettings.HOTSET_APPS.length; i++ ) {
+            if (LauncherSettings.HOTSET_APPS[i].equals(packageName)) {
+                return true;
+            }
         }
-        bindWorkspaceItems(workspaceItems);
+        return false;
     }
 
     public static class ShortcutNameComparator implements Comparator<LauncherActivityInfoCompat> {
