@@ -14,6 +14,7 @@ import android.widget.TextView;
 public class BubbleTextView extends TextView {
     private int mTextColor;
     private boolean mIsTextVisible;
+    private final int ICON_TEXT_PADDING = 10;
     private final String TAG = "BubbleTextView";
     public BubbleTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -34,8 +35,7 @@ public class BubbleTextView extends TextView {
 
         setCompoundDrawables(null, iconDrawable, null, null);
         if (setDefaultPadding) {
-            /*DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();*/
-            setCompoundDrawablePadding(30);
+            setCompoundDrawablePadding(ICON_TEXT_PADDING);
         }
         if (info.contentDescription != null) {
             setContentDescription(info.contentDescription);
@@ -43,15 +43,6 @@ public class BubbleTextView extends TextView {
         setText(info.title);
         Log.v(TAG, "applyFromShortcutInfo info.title = " + info.title);
         setTag(info);
-
-/*        Resources resources = Resources.getSystem();
-        Drawable drawable = resources.getDrawable(android.R.mipmap.sym_def_app_icon);
-        drawable.setBounds(0, 0, 100, 100);
-        setCompoundDrawables(drawable, null, null, null);
-
-        setText(info.title);
-        Log.v(TAG, "applyFromShortcutInfo info.title = " + info.title);
-        setTag(info);*/
     }
 
     @Override

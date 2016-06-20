@@ -25,7 +25,7 @@ final public class LauncherSettings {
     //icon width
     public static final int ICON_WIDTH = 130;
     //icon height
-    public static final int ICON_HEIGHT = 130;
+    public static final int ICON_HEIGHT = 160;
     //icon padding
     public static final int ICON_PADDING = 0;
     //mCountX cells in horizental

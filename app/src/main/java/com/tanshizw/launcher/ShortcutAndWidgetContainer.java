@@ -26,4 +26,12 @@ public class ShortcutAndWidgetContainer extends ViewGroup {
             child.layout(params.x, params.y, params.x + params.width, params.y + params.height);
         }
     }
+
+    public void measureChild(View child) {
+        CellLayout.LayoutParams lp = (CellLayout.LayoutParams) child.getLayoutParams();
+        int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(lp.width, MeasureSpec.EXACTLY);
+        int childheightMeasureSpec = MeasureSpec.makeMeasureSpec(lp.height,
+                MeasureSpec.EXACTLY);
+        child.measure(childWidthMeasureSpec, childheightMeasureSpec);
+    }
 }
