@@ -59,18 +59,24 @@ public class CellLayout extends ViewGroup {
 
         // Hotseat icons need remove text
         if (child instanceof BubbleTextView) {
+            ItemInfo info = (ItemInfo) child.getTag();
             Log.v(TAG, "addViewToCellLayout BubbleTextView");
             BubbleTextView bubbleChild = (BubbleTextView) child;
-            bubbleChild.setTextVisibility(true);
+            if(info.container == LauncherSettings.CONTAINER_DESKTOP){
+                bubbleChild.setTextVisibility(true);
+            }else if(info.container == LauncherSettings.CONTAINER_HOTSEAT){
+                bubbleChild.setTextVisibility(false);
+            }
         }
 
         if (lp.cellX >= 0 && lp.cellX <= mCountX - 1 && lp.cellY >= 0 && lp.cellY <= mCountY - 1) {
             if (lp.cellHSpan < 0) lp.cellHSpan = mCountX;
             if (lp.cellVSpan < 0) lp.cellVSpan = mCountY;
 
-            child.setId(childId);
             mShortcutsAndWidgets.addView(child, index, lp);
             Log.v(TAG, "addView child.getText = " + ((TextView)child).getText());
+
+            mShortcutsAndWidgets.measureChild(child);
 
             //if (markCells) markCellsAsOccupiedForView(child);
 
