@@ -110,8 +110,4 @@ public class Workspace extends SmoothPagedView implements Insettable{
         Log.v(TAG, "insertNewWorkspaceScreen getChildCount() = " + getChildCount());
         return screenId;
     }
-
-    protected void onPageBeginMoving() {
-
-    }
 }
