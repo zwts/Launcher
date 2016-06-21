@@ -38,8 +38,6 @@ public class SmoothPagedView  extends ViewGroup {
     protected float mLastMotionX;
     protected float mLastMotionY;
 
-    int screenWidth;
-
     protected boolean mIsPageMoving = false;
 
     public SmoothPagedView(Context context, AttributeSet attrs) {
@@ -47,7 +45,6 @@ public class SmoothPagedView  extends ViewGroup {
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.PagedView, 0, 0);
         mPageIndicatorViewId = a.getResourceId(R.styleable.PagedView_pageIndicator, -1);
-        screenWidth = LauncherSettings.SCREEN_WIDTH;
     }
     public SmoothPagedView(Context context, AttributeSet attrs, int defStyle){
         super(context, attrs, defStyle);
@@ -99,7 +96,6 @@ public class SmoothPagedView  extends ViewGroup {
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         super.onTouchEvent(ev);
-        Log.v(TAG, "onTouchEvent");
 
         // Skip touch handling if there are no pages to swipe
         if (getChildCount() <= 0) return super.onTouchEvent(ev);
@@ -117,8 +113,7 @@ public class SmoothPagedView  extends ViewGroup {
                 Log.v(TAG, "mTouchState = " + mTouchState);
                 if(mTouchState == TOUCH_STATE_SCROLLING){
                     if(Math.abs(deltaX) >= 1.0f) {
-                        scrollTo((int) (mCurrentPage * screenWidth + deltaX), 0);
-                        Log.v(TAG, "scroll x = " + mCurrentPage * screenWidth + deltaX);
+                        scrollTo((int) (mCurrentPage * LauncherSettings.SCREEN_WIDTH + deltaX), 0);
                     }
                     if(Math.abs(deltaX) >= LauncherSettings.SNAP_SCREEN_GAP){
                         if(deltaX > 0 && canSnapNext()){
@@ -131,7 +126,7 @@ public class SmoothPagedView  extends ViewGroup {
                     }
                 }else if(mTouchState == TOUCH_STATE_NEXT_PAGE || mTouchState == TOUCH_STATE_PREV_PAGE) {
                     if(Math.abs(deltaX) >= 1.0f) {
-                        scrollTo((int) (mCurrentPage * screenWidth + deltaX), 0);
+                        scrollTo((int) (mCurrentPage * LauncherSettings.SCREEN_WIDTH + deltaX), 0);
                     }
                 }else if(mTouchState == TOUCH_STATE_INVALIDE) {
                     int constDeltaX;
@@ -140,14 +135,14 @@ public class SmoothPagedView  extends ViewGroup {
                     }else {
                         constDeltaX = -LauncherSettings.SNAP_SCREEN_GAP;
                     }
-                    scrollTo(mCurrentPage * screenWidth + constDeltaX, 0);
+                    scrollTo(mCurrentPage * LauncherSettings.SCREEN_WIDTH + constDeltaX, 0);
                 }else {
                     determineScrollingStart(ev);
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 int currentPage = getCurrentPage();
-                if(Math.abs(x - mLastMotionX) > (screenWidth / 2)) {
+                if(Math.abs(x - mLastMotionX) > (LauncherSettings.SCREEN_WIDTH / 2)) {
                     if (mTouchState == TOUCH_STATE_PREV_PAGE) {
                         Log.v(TAG, "need snap to prev page");
                         if(currentPage > 0){
