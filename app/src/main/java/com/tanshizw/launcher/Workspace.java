@@ -54,6 +54,17 @@ public class Workspace extends SmoothPagedView implements Insettable{
         }
     }
 
+    /**
+     * Adds the specified child in the specified screen. The position and dimension of
+     * the child are defined by x, y, spanX and spanY.
+     *
+     * @param child The child to add in one of the workspace's screens.
+     * @param screenId The screen in which to add the child.
+     * @param x The X position of the child in the screen's grid.
+     * @param y The Y position of the child in the screen's grid.
+     * @param spanX The number of cells spanned horizontally by the child.
+     * @param spanY The number of cells spanned vertically by the child.
+     */
     void addInScreenFromBind(View child, long container, long screenId, int x, int y, int spanX, int spanY) {
         Log.v(TAG, "addInScreenFromBind");
         if (container == LauncherSettings.CONTAINER_DESKTOP) {
@@ -65,10 +76,9 @@ public class Workspace extends SmoothPagedView implements Insettable{
             }
         }
 
-        CellLayout layout = null;
+        CellLayout layout;
         if (container == LauncherSettings.CONTAINER_HOTSEAT) {
             layout = mLauncher.getHotseat().getLayout();
-            Log.v(TAG, "layout = " + layout);
         } else {
             layout = getScreenWithId(screenId);
         }
@@ -88,16 +98,17 @@ public class Workspace extends SmoothPagedView implements Insettable{
             lp.cellHSpan = spanX;
             lp.cellVSpan = spanY;
         }
-
-        // Get the canonical child id to uniquely represent this view in this screen
-        ItemInfo info = (ItemInfo) child.getTag();
-        int childId = mLauncher.getViewIdForItem(info);
-        Log.v(TAG, "addInScreenFromBind childId = " + childId);
-        if (!layout.addViewToCellLayout(child, 0, childId, lp, true)) {
-            // TODO: This branch occurs when the workspace is adding views
+        
+        if (!layout.addViewToCellLayout(child, 0, lp, true)) {
+            Log.v(TAG, "add view to CellLayout failed");
         }
     }
 
+    /**
+     * Insert page in workspace
+     *
+     * @param screenId The screen id.
+     */
     public long insertNewWorkspaceScreen(long screenId) {
         Log.v(TAG, "insertNewWorkspaceScreen screenId = " + screenId);
         if (mWorkspaceScreens.containsKey(screenId)) {

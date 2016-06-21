@@ -53,7 +53,7 @@ public class CellLayout extends ViewGroup {
         }
     }
 
-    public boolean addViewToCellLayout(View child, int index, int childId, LayoutParams params,
+    public boolean addViewToCellLayout(View child, int index, LayoutParams params,
                                        boolean markCells) {
         final LayoutParams lp = params;
 
@@ -105,13 +105,25 @@ public class CellLayout extends ViewGroup {
     }
 
     public static class LayoutParams extends ViewGroup.MarginLayoutParams{
+        /**
+         * Horizontal location of the item in the grid.
+         */
         public int cellX;
+        /**
+         * Vertical location of the item in the grid.
+         */
         public int cellY;
-        //cellHSpan Width in cells
+        /**
+         * Number of cells spanned horizontally by the item.
+         */
         public int cellHSpan;
-        //cellVSpan Height in cells
+        /**
+         * Number of cells spanned vertically by the item.
+         */
         public int cellVSpan;
+        // X coordinate of the view in the layout.
         public int x;
+        // Y coordinate of the view in the layout.
         public int y;
 
         public LayoutParams(Context c, AttributeSet attrs) {
@@ -134,8 +146,8 @@ public class CellLayout extends ViewGroup {
 
             width = myCellHSpan * cellWidth;
             height = myCellVSpan * cellHeight;
-            x = (int) (myCellX * (cellWidth + widthGap) + leftMargin);
-            y = (int) (myCellY * (cellHeight + heightGap) + topMargin);
+            x = myCellX * (cellWidth + widthGap) + leftMargin;
+            y = myCellY * (cellHeight + heightGap) + topMargin;
         }
     }
 }

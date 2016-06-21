@@ -3,7 +3,6 @@ package com.tanshizw.launcher;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.TextView;
@@ -14,7 +13,7 @@ import android.widget.TextView;
 public class BubbleTextView extends TextView {
     private int mTextColor;
     private boolean mIsTextVisible;
-    private final int ICON_TEXT_PADDING = 10;
+    private final int ICON_TEXT_PADING = 10;
     private final String TAG = "BubbleTextView";
     public BubbleTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -35,7 +34,8 @@ public class BubbleTextView extends TextView {
 
         setCompoundDrawables(null, iconDrawable, null, null);
         if (setDefaultPadding) {
-            setCompoundDrawablePadding(ICON_TEXT_PADDING);
+            /*DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();*/
+            setCompoundDrawablePadding(ICON_TEXT_PADING);
         }
         if (info.contentDescription != null) {
             setContentDescription(info.contentDescription);
@@ -60,5 +60,6 @@ public class BubbleTextView extends TextView {
         }
         mIsTextVisible = visible;
     }
+
 
 }

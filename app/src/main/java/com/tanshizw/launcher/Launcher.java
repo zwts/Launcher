@@ -1,21 +1,17 @@
 package com.tanshizw.launcher;
 
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Rect;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 import com.tanshizw.launcher.Utility.LauncherSettings;
 
@@ -25,7 +21,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Launcher extends Activity implements View.OnClickListener {
     private IconCache mIconCache;
@@ -39,8 +34,6 @@ public class Launcher extends Activity implements View.OnClickListener {
     Workspace mWorkspace;
     Hotseat mHotseat;
     ArrayList<ItemInfo> workspaceItems = new ArrayList<ItemInfo>();
-    private HashMap<Integer, Integer> mItemIdToViewId = new HashMap<Integer, Integer>();
-    private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
     ArrayList<Long> orderedScreenIds = new ArrayList<Long>();
     private LayoutInflater mInflater;
     static final int ITEM_TYPE_APPLICATION = 0;
@@ -60,6 +53,7 @@ public class Launcher extends Activity implements View.OnClickListener {
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         LauncherSettings.SCREEN_WIDTH = dm.widthPixels;
         LauncherSettings.SCREEN_HEIGHT = dm.heightPixels;
+        Log.v(TAG, "dm.widthPixels = " + dm.widthPixels);
 
         setupViews();
 
@@ -73,12 +67,18 @@ public class Launcher extends Activity implements View.OnClickListener {
         setupWorkspaceItems();
     }
 
+    /**
+     * Finds all the views we need.
+     */
     private void setupViews() {
         mDragLayer = (DragLayer) findViewById(R.id.drag_layer);
         mWorkspace = (Workspace) mDragLayer.findViewById(R.id.workspace);
         mHotseat = (Hotseat) mDragLayer.findViewById(R.id.hot_seat);
     }
 
+    /**
+     * Prepare all items.
+     */
     private void setupWorkspaceItems() {
         int hotseatAppNum = 0;
         int desktopAppNum = 0;
@@ -185,8 +185,9 @@ public class Launcher extends Activity implements View.OnClickListener {
         }
     }
 
-    ;
-
+    /**
+     * Add screens in workspace.
+     */
     public void bindAddScreens(ArrayList<Long> orderedScreenIds) {
         int count = orderedScreenIds.size();
         for (int i = 0; i < count; i++) {
@@ -198,6 +199,9 @@ public class Launcher extends Activity implements View.OnClickListener {
         mHotseat.insertHotseatLayout();
     }
 
+    /**
+     * Add shortcut items in workspace.
+     */
     private void bindWorkspaceItems(final ArrayList<ItemInfo> workspaceItems) {
         // Bind the workspace items
         int N = workspaceItems.size();
@@ -218,6 +222,14 @@ public class Launcher extends Activity implements View.OnClickListener {
         }
     }
 
+    /**
+     * Creates a BubbleTextView representing a shortcut.
+     *
+     * @param info The data structure describing the shortcut.
+     *
+     * @return A BubbleTextView inflated from R.layout.application
+     * which will display in workspace and hotseat.
+     */
     View createShortcut(int layoutResId, ViewGroup parent, ShortcutInfo info) {
         Log.v(TAG, "createShortcut");
         BubbleTextView favorite = (BubbleTextView) mInflater.inflate(layoutResId, parent, false);
@@ -232,6 +244,11 @@ public class Launcher extends Activity implements View.OnClickListener {
                 (ViewGroup) mWorkspace.getChildAt(mWorkspace.getCurrentPage()), info);
     }
 
+    /**
+     * Bind the items start-end from the list.
+     *
+     * these item will added in workspace
+     */
     public void bindItems(final ArrayList<ItemInfo> shortcuts, final int start, final int end) {
         Log.v(TAG, "bindItems");
         for (int i = start; i < end; i++) {
@@ -250,31 +267,6 @@ public class Launcher extends Activity implements View.OnClickListener {
                     break;
             }
         }
-    }
-
-    public static int generateViewId() {
-        if (Build.VERSION.SDK_INT >= 17) {
-            return View.generateViewId();
-        } else {
-            for (; ; ) {
-                final int result = sNextGeneratedId.get();
-                int newValue = result + 1;
-                if (newValue > 0x00FFFFFF) newValue = 1; // Roll over to 1, not 0.
-                if (sNextGeneratedId.compareAndSet(result, newValue)) {
-                    return result;
-                }
-            }
-        }
-    }
-
-    public int getViewIdForItem(ItemInfo info) {
-        int itemId = (int) info.id;
-        if (mItemIdToViewId.containsKey(itemId)) {
-            return mItemIdToViewId.get(itemId);
-        }
-        int viewId = generateViewId();
-        mItemIdToViewId.put(itemId, viewId);
-        return viewId;
     }
 
     @Override
