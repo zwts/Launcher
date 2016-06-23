@@ -27,20 +27,20 @@ public class PageIndicator extends LinearLayout {
         mLayoutInflater = LayoutInflater.from(context);
     }
 
-    public void setActiveMarkerIndex(int index){
+    public void setActiveMarkerIndex(int index) {
         mActiveMarkerIndex = index;
         for (int i = 0; i < mMarkers.size(); ++i) {
             PageIndicatorMarker marker = (PageIndicatorMarker) mMarkers.get(i);
             if (i == mActiveMarkerIndex) {
                 marker.activate();
-            }else{
+            } else {
                 marker.inactivate();
             }
         }
     }
 
     public void offsetWindowCenterTo() {
-        for(int i = getChildCount(); i >= 0; i--){
+        for (int i = getChildCount(); i >= 0; i--) {
             PageIndicatorMarker marker = (PageIndicatorMarker) getChildAt(i);
             removeView(marker);
         }
@@ -51,13 +51,13 @@ public class PageIndicator extends LinearLayout {
             addView(marker, i);
             if (i == mActiveMarkerIndex) {
                 marker.activate();
-            }else{
+            } else {
                 marker.inactivate();
             }
         }
     }
 
-    public void addMarker(){
+    public void addMarker() {
         int index = mMarkers.size();
         Log.v(TAG, "addMarker index = " + index);
         PageIndicatorMarker m =

@@ -27,6 +27,7 @@ public class ShortcutInfo extends ItemInfo {
         }
         return mIcon;
     }
+
     public Bitmap getIcon() {
         return mIcon;
     }
