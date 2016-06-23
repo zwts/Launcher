@@ -12,9 +12,6 @@ import com.tanshizw.launcher.items.BubbleTextView;
 import com.tanshizw.launcher.items.ItemInfo;
 import com.tanshizw.launcher.utility.LauncherSettings;
 
-/**
- * Created by user on 6/6/16.
- */
 public class CellLayout extends ViewGroup {
     private int mCountX;
     private int mCountY;
@@ -36,11 +33,9 @@ public class CellLayout extends ViewGroup {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         Log.v(TAG, "onLayout l = " + l + "; t = " + t + "; r = " + r + "; b = " + b);
-        int x = 0;
-        int y = 0;
         for (int i = 0; i < getChildCount(); i++) {
             final View child = getChildAt(i);
-            child.layout(x, y, LauncherSettings.SCREEN_WIDTH, b);
+            child.layout(0, 0, LauncherSettings.SCREEN_WIDTH, b);
         }
     }
 
@@ -57,21 +52,10 @@ public class CellLayout extends ViewGroup {
         }
     }
 
-    public boolean addViewToCellLayout(View child, int index, LayoutParams params,
+    public boolean addViewToCellLayout(View child, int index, LayoutParams lp,
                                        boolean markCells) {
-        final LayoutParams lp = params;
 
         // Hotseat icons need remove text
-        if (child instanceof BubbleTextView) {
-            ItemInfo info = (ItemInfo) child.getTag();
-            Log.v(TAG, "addViewToCellLayout BubbleTextView");
-            BubbleTextView bubbleChild = (BubbleTextView) child;
-            if (info.container == LauncherSettings.CONTAINER_DESKTOP) {
-                bubbleChild.setTextVisibility(true);
-            } else if (info.container == LauncherSettings.CONTAINER_HOTSEAT) {
-                bubbleChild.setTextVisibility(false);
-            }
-        }
 
         if (lp.cellX >= 0 && lp.cellX <= mCountX - 1 && lp.cellY >= 0 && lp.cellY <= mCountY - 1) {
             if (lp.cellHSpan < 0) lp.cellHSpan = mCountX;

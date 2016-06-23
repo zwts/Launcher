@@ -28,16 +28,16 @@ public class AppInfo extends ItemInfo {
     /**
      * Used in setupWorkspaceItems, the resource of application items
      */
-    public AppInfo(Context context, LauncherActivityInfoCompat info,
+    public AppInfo(LauncherActivityInfoCompat info,
                    IconCache iconCache, HashMap<Object, CharSequence> labelCache) {
         this.componentName = info.getComponentName();
         this.container = ItemInfo.NO_ID;
 
         iconCache.getTitleAndIcon(this, info, labelCache);
-        intent = makeLaunchIntent(context, info);
+        intent = makeLaunchIntent(info);
     }
 
-    public static Intent makeLaunchIntent(Context context, LauncherActivityInfoCompat info) {
+    public static Intent makeLaunchIntent(LauncherActivityInfoCompat info) {
         return new Intent(Intent.ACTION_MAIN)
                 .addCategory(Intent.CATEGORY_LAUNCHER)
                 .setComponent(info.getComponentName())

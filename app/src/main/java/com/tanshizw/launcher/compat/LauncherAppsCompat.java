@@ -34,7 +34,7 @@ public class LauncherAppsCompat {
         }
     }
 
-    public List<LauncherActivityInfoCompat> getActivityList(String packageName) {
+    public List<LauncherActivityInfoCompat> getActivityList() {
         final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 

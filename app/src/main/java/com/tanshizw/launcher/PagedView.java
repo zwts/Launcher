@@ -11,10 +11,7 @@ import android.view.ViewGroup;
 import com.tanshizw.launcher.utility.LauncherSettings;
 import com.tanshizw.launcher.view.PageIndicator;
 
-/**
- * Created by user on 6/8/16.
- */
-public class SmoothPagedView extends ViewGroup {
+public class PagedView extends ViewGroup {
     protected int mCurrentPage;
     private static final String TAG = "SmoothPagedView";
 
@@ -35,14 +32,14 @@ public class SmoothPagedView extends ViewGroup {
 
     protected boolean mIsPageMoving = false;
 
-    public SmoothPagedView(Context context, AttributeSet attrs) {
+    public PagedView(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.PagedView, 0, 0);
         mPageIndicatorViewId = a.getResourceId(R.styleable.PagedView_pageIndicator, -1);
     }
 
-    public SmoothPagedView(Context context, AttributeSet attrs, int defStyle) {
+    public PagedView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }
@@ -190,16 +187,10 @@ public class SmoothPagedView extends ViewGroup {
     }
 
     protected boolean canSnapPrev() {
-        if ((getCurrentPage() - 1) >= 0) {
-            return true;
-        }
-        return false;
+        return (getCurrentPage() > 0);
     }
 
     protected boolean canSnapNext() {
-        if ((getCurrentPage() + 1) < getChildCount()) {
-            return true;
-        }
-        return false;
+        return ((getCurrentPage() < getChildCount() - 1));
     }
 }

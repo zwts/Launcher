@@ -10,16 +10,14 @@ import java.util.ArrayList;
  * Stores the list of all applications for the all apps view.
  */
 public class AllAppsList {
-    public static final int DEFAULT_APPLICATIONS_NUMBER = 42;
+    private static final int DEFAULT_APPLICATIONS_NUMBER = 42;
 
     /* List of all Apps*/
-    public ArrayList<AppInfo> data =
+    private ArrayList<AppInfo> data =
             new ArrayList<>(DEFAULT_APPLICATIONS_NUMBER);
 
-    private IconCache mIconCache;  // I wonder what's the usage of is field
+    public AllAppsList() {
 
-    public AllAppsList(IconCache iconCache) {
-        mIconCache = iconCache;
     }
 
     public void add(AppInfo info) {
@@ -41,24 +39,15 @@ public class AllAppsList {
         data.clear();
     }
 
-
     /**
      * Returns whether apps contains component.
      */
     private static boolean findActivity(ArrayList<AppInfo> apps, ComponentName component) {
-        final int N = apps.size();
-        for (int i = 0; i < N; i++) {
-            final AppInfo info = apps.get(i);
+        for (AppInfo info : apps) {
             if (info.componentName.equals(component)) {
                 return true;
             }
         }
-        // use
-//        for (AppInfo info : apps) {
-//            if (info.componentName.equals(component)) {
-//                return true;
-//            }
-//        }
         return false;
     }
 }

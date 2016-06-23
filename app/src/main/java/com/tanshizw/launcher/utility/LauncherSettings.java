@@ -36,6 +36,8 @@ final public class LauncherSettings {
     public static final int mCountY = 6;
     //slide the page deltaX gap
     public static final int SLIDE_PAGE_DELTAX = 50;
+
+    public static final int DEFAULT_PAGE_NUM = 2;
     //screen width
     public static int SCREEN_WIDTH;
     //screen height

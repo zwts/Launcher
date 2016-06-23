@@ -15,19 +15,13 @@ import com.tanshizw.launcher.items.ItemInfo;
 
 import java.util.HashSet;
 
-/**
- * Created by sdduser on 6/17/16. DragView dragView = new DragView(Launcher.this,favorite,mDragLayer,workspaceItems.get(i),info.getIcon());
- * dragView.show();
- */
 public class DragView extends View {
     private BubbleTextView favorite;
     private DragLayer dragLayer;
     private ItemInfo itemInfo;
     private Bitmap bitmap;
-    private HashSet<Integer> locationMarker;
     private Workspace workspace;
     private Launcher launcher;
-    private int i;
 
 
     private float x;
@@ -39,17 +33,18 @@ public class DragView extends View {
     private int newCellY = 0;
     private int newScreenId;
 
+    public DragView(Context context) {
+        super(context);
+    }
 
-    public DragView(Context context, BubbleTextView favorite, DragLayer dragLayer, ItemInfo itemInfo, Bitmap bitmap, HashSet<Integer> locationMarker, Workspace workspace, int i) {
+    public DragView(Context context, BubbleTextView favorite, DragLayer dragLayer, ItemInfo itemInfo, Bitmap bitmap, Workspace workspace) {
         super(context);
         this.favorite = favorite;
         this.dragLayer = dragLayer;
         this.itemInfo = itemInfo;
         this.bitmap = bitmap;
-        this.locationMarker = locationMarker;
         this.workspace = workspace;
         this.launcher = (Launcher) context;
-        this.i = i;
 
         paint = new Paint();
         halfOfIconWPx = context.getResources().getDimensionPixelSize(R.dimen.app_icon_size) / 2;
@@ -77,6 +72,7 @@ public class DragView extends View {
             case MotionEvent.ACTION_DOWN:
                 x = event.getX();
                 y = event.getY();
+
                 Log.i("ACTION_DOWN", "====xxxx==" + event.getX() + "+++YYY" + event.getY());
                 postInvalidate();
                 break;
@@ -160,12 +156,15 @@ public class DragView extends View {
     }
 
     private void moveView() {
-        Log.i("--contains-----", (locationMarker.contains(newScreenId * 100 + newCellY * 10 + newCellX)) + "");
-        if (!locationMarker.contains(newScreenId * 100 + newCellY * 10 + newCellX)) {
+
+        int newLocationId = newScreenId * 100 + newCellY * 10 + newCellX;
+        boolean used = dragLayer.isLocationUsed(newLocationId);
+        Log.i("--contains-----", used + "");
+        if (!used) {
             Log.i("--trsPageFlag-----", trsPageFlag + "翻页");
             if (trsPageFlag) {
-                locationMarker.remove((int) itemInfo.screenId * 100 + itemInfo.cellY * 10 + itemInfo.cellX);
-                locationMarker.add(newScreenId * 100 + newCellY * 10 + newCellX);
+                dragLayer.removeLocation(itemInfo.screenId * 100 + itemInfo.cellY * 10 + itemInfo.cellX);
+                dragLayer.addLocation(newLocationId);
                 itemInfo.cellX = newCellX;
                 itemInfo.cellY = newCellY;
                 itemInfo.screenId = newScreenId;
@@ -183,8 +182,8 @@ public class DragView extends View {
                 favorite.setTranslationX((newCellX - itemInfo.initCellX) * LauncherSettings.ICON_WIDTH);
                 favorite.setTranslationY((newCellY - itemInfo.initCellY) * LauncherSettings.ICON_HEIGHT);
                 favorite.invalidate();
-                locationMarker.remove((int) itemInfo.screenId * 100 + itemInfo.cellY * 10 + itemInfo.cellX);
-                locationMarker.add(newScreenId * 100 + newCellY * 10 + newCellX);
+                dragLayer.removeLocation((int) itemInfo.screenId * 100 + itemInfo.cellY * 10 + itemInfo.cellX);
+                dragLayer.addLocation(newScreenId * 100 + newCellY * 10 + newCellX);
 
                 itemInfo.cellX = newCellX;
                 itemInfo.cellY = newCellY;
@@ -205,7 +204,7 @@ public class DragView extends View {
 
     private void reAddFavorite() {
         ShortcutInfo info = (ShortcutInfo) itemInfo;
-        View shortcut = launcher.createShortcut(info, i);
+        View shortcut = launcher.createShortcut(info);
         workspace.addInScreenFromBind(shortcut, itemInfo.container, itemInfo.screenId, itemInfo.cellX,
                 itemInfo.cellY, itemInfo.spanX, itemInfo.spanY);
 

@@ -17,10 +17,6 @@ public class ShortcutInfo extends ItemInfo {
      */
     private Bitmap mIcon;
 
-    public Intent getIntent() {
-        return intent;
-    }
-
     public Bitmap getIcon(IconCache iconCache) {
         if (mIcon == null) {
             updateIcon(iconCache);

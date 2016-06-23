@@ -6,9 +6,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
-/**
- * Created by user on 6/8/16.
- */
 public class ShortcutAndWidgetContainer extends ViewGroup {
     private static final String TAG = "ShortcutContainer";
 

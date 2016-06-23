@@ -1,7 +1,6 @@
 package com.tanshizw.launcher;
 
 import android.content.Context;
-import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -11,10 +10,7 @@ import com.tanshizw.launcher.utility.LauncherSettings;
 
 import java.util.HashMap;
 
-/**
- * Created by user on 6/7/16.
- */
-public class Workspace extends SmoothPagedView implements Insettable{
+public class Workspace extends PagedView {
     private HashMap<Long, CellLayout> mWorkspaceScreens = new HashMap<Long, CellLayout>();
     private static final String TAG = "Launcher.Workspace";
     private Launcher mLauncher;
@@ -25,19 +21,13 @@ public class Workspace extends SmoothPagedView implements Insettable{
 
     }
 
-    public Workspace(Context context, AttributeSet attrs, int defStyle){
+    public Workspace(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         mLauncher = (Launcher) context;
     }
 
     public CellLayout getScreenWithId(long screenId) {
-        CellLayout layout = mWorkspaceScreens.get(screenId);
-        return layout;
-    }
-
-    @Override
-    public void setInsets(Rect insets) {
-
+        return mWorkspaceScreens.get(screenId);
     }
 
     @Override
@@ -47,8 +37,8 @@ public class Workspace extends SmoothPagedView implements Insettable{
         int count = getChildCount();
         int x = l;
         int y = t;
-        for(int i = 0; i < count; i++){
-            View child = (View)getChildAt(i);
+        for (int i = 0; i < count; i++) {
+            View child = (View) getChildAt(i);
             child.layout(x, y, x + r, y + b);
             x = x + r;
         }
@@ -58,12 +48,12 @@ public class Workspace extends SmoothPagedView implements Insettable{
      * Adds the specified child in the specified screen. The position and dimension of
      * the child are defined by x, y, spanX and spanY.
      *
-     * @param child The child to add in one of the workspace's screens.
+     * @param child    The child to add in one of the workspace's screens.
      * @param screenId The screen in which to add the child.
-     * @param x The X position of the child in the screen's grid.
-     * @param y The Y position of the child in the screen's grid.
-     * @param spanX The number of cells spanned horizontally by the child.
-     * @param spanY The number of cells spanned vertically by the child.
+     * @param x        The X position of the child in the screen's grid.
+     * @param y        The Y position of the child in the screen's grid.
+     * @param spanX    The number of cells spanned horizontally by the child.
+     * @param spanY    The number of cells spanned vertically by the child.
      */
     void addInScreenFromBind(View child, long container, long screenId, int x, int y, int spanX, int spanY) {
         Log.v(TAG, "addInScreenFromBind");
@@ -98,7 +88,7 @@ public class Workspace extends SmoothPagedView implements Insettable{
             lp.cellHSpan = spanX;
             lp.cellVSpan = spanY;
         }
-        
+
         if (!layout.addViewToCellLayout(child, 0, lp, true)) {
             Log.v(TAG, "add view to CellLayout failed");
         }
@@ -109,16 +99,13 @@ public class Workspace extends SmoothPagedView implements Insettable{
      *
      * @param screenId The screen id.
      */
-    public long insertNewWorkspaceScreen(long screenId) {
-        Log.v(TAG, "insertNewWorkspaceScreen screenId = " + screenId);
+    public void insertNewWorkspaceScreen(long screenId) {
         if (mWorkspaceScreens.containsKey(screenId)) {
             throw new RuntimeException("Screen id " + screenId + " already exists!");
         }
         CellLayout newScreen = (CellLayout)
-                mLauncher.getLayoutInflater().inflate(R.layout.workspace_screen, null); // use this instead of null
+                mLauncher.getLayoutInflater().inflate(R.layout.workspace_screen, null);
         mWorkspaceScreens.put(screenId, newScreen);
         addView(newScreen, getChildCount());
-        Log.v(TAG, "insertNewWorkspaceScreen getChildCount() = " + getChildCount());
-        return screenId;   // why return this screenId?
     }
 }
