@@ -1,5 +1,7 @@
 package com.tanshizw.launcher.items;
 
+// and is it good to put all apps list in items?
+
 import android.content.ComponentName;
 
 import java.util.ArrayList;
@@ -8,13 +10,13 @@ import java.util.ArrayList;
  * Stores the list of all applications for the all apps view.
  */
 public class AllAppsList {
-    public  static final int DEFAULT_APPLICATIONS_NUMBER = 42;
+    public static final int DEFAULT_APPLICATIONS_NUMBER = 42;
 
     /* List of all Apps*/
     public ArrayList<AppInfo> data =
-            new ArrayList<AppInfo>(DEFAULT_APPLICATIONS_NUMBER);
+            new ArrayList<>(DEFAULT_APPLICATIONS_NUMBER);
 
-    private IconCache mIconCache;
+    private IconCache mIconCache;  // I wonder what's the usage of is field
 
     public AllAppsList(IconCache iconCache) {
         mIconCache = iconCache;
@@ -35,7 +37,7 @@ public class AllAppsList {
         return data.size();
     }
 
-    public void clear() {
+    public void clear() {     // when will you clear the list?
         data.clear();
     }
 
@@ -51,6 +53,12 @@ public class AllAppsList {
                 return true;
             }
         }
+        // use
+//        for (AppInfo info : apps) {
+//            if (info.componentName.equals(component)) {
+//                return true;
+//            }
+//        }
         return false;
     }
 }

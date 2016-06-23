@@ -17,7 +17,7 @@ import java.util.HashSet;
 
 /**
  * Created by sdduser on 6/17/16. DragView dragView = new DragView(Launcher.this,favorite,mDragLayer,workspaceItems.get(i),info.getIcon());
-                dragView.show();
+ * dragView.show();
  */
 public class DragView extends View {
     private BubbleTextView favorite;
@@ -40,8 +40,7 @@ public class DragView extends View {
     private int newScreenId;
 
 
-
-    public DragView(Context context, BubbleTextView favorite, DragLayer dragLayer, ItemInfo itemInfo, Bitmap bitmap,HashSet<Integer> locationMarker,Workspace workspace,int i ) {
+    public DragView(Context context, BubbleTextView favorite, DragLayer dragLayer, ItemInfo itemInfo, Bitmap bitmap, HashSet<Integer> locationMarker, Workspace workspace, int i) {
         super(context);
         this.favorite = favorite;
         this.dragLayer = dragLayer;
@@ -49,40 +48,42 @@ public class DragView extends View {
         this.bitmap = bitmap;
         this.locationMarker = locationMarker;
         this.workspace = workspace;
-        this.launcher = (Launcher)context;
+        this.launcher = (Launcher) context;
         this.i = i;
 
         paint = new Paint();
-        halfOfIconWPx = context.getResources().getDimensionPixelSize(R.dimen.app_icon_size)/2;
-        x = (float)(itemInfo.cellX+0.5) * LauncherSettings.ICON_WIDTH - halfOfIconWPx - 10;
-        y = (itemInfo.cellY)* LauncherSettings.ICON_HEIGHT+LauncherSettings.WORKSPACE_TOPPADDING*2+10;
+        halfOfIconWPx = context.getResources().getDimensionPixelSize(R.dimen.app_icon_size) / 2;
+
+        // not good to calculate such a x and y.
+        x = (float) (itemInfo.cellX + 0.5) * LauncherSettings.ICON_WIDTH - halfOfIconWPx - 10;
+        y = (itemInfo.cellY) * LauncherSettings.ICON_HEIGHT + LauncherSettings.WORKSPACE_TOPPADDING * 2 + 10;
 
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawBitmap(bitmap,x,y,paint);
+        canvas.drawBitmap(bitmap, x, y, paint);
     }
 
-    public void show(){
+    public void show() {
         dragLayer.addView(DragView.this);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         super.onTouchEvent(event);
-        switch (event.getAction()){
+        switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 x = event.getX();
                 y = event.getY();
-                Log.i("ACTION_DOWN","====xxxx=="+event.getX()+"+++YYY"+event.getY());
+                Log.i("ACTION_DOWN", "====xxxx==" + event.getX() + "+++YYY" + event.getY());
                 postInvalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
                 x = event.getX();
                 y = event.getY();
-                Log.i("ACTION_MOVE","========xxxx=="+event.getX()+"+++YYY"+event.getY());
+                Log.i("ACTION_MOVE", "========xxxx==" + event.getX() + "+++YYY" + event.getY());
                 move();
                 postInvalidate();
 
@@ -91,8 +92,7 @@ public class DragView extends View {
                 x = event.getX();
                 y = event.getY();
                 up();
-                Log.i("ACTION_UP","========xxxx=="+event.getX()+"+++YYY"+event.getY());
-
+                Log.i("ACTION_UP", "========xxxx==" + event.getX() + "+++YYY" + event.getY());
 
 
                 break;
@@ -101,13 +101,13 @@ public class DragView extends View {
     }
 
     private void move() {
-        Log.i("---------",workspace.getChildCount()+"CCC"+workspace.getCurrentPage());
-        if(x>=Launcher.mScreenW - halfOfIconWPx){
-            if(workspace.getCurrentPage()<=workspace.getChildCount()-1-1){
-                workspace.snapPage(workspace.getCurrentPage()+1);
+        Log.i("---------", workspace.getChildCount() + "CCC" + workspace.getCurrentPage());
+        if (x >= Launcher.mScreenW - halfOfIconWPx) {
+            if (workspace.getCurrentPage() <= workspace.getChildCount() - 1 - 1) {
+                workspace.snapPage(workspace.getCurrentPage() + 1);
                 trsPageFlag = true;
-                Log.i("---------",workspace.getChildCount()+"CCC"+workspace.getCurrentPage());
-            }else{
+                Log.i("---------", workspace.getChildCount() + "CCC" + workspace.getCurrentPage());
+            } else {
                 //workspace.insertNewWorkspaceScreen(workspace.getCurrentPage()+1);
             }
         }
@@ -121,70 +121,70 @@ public class DragView extends View {
         moveView();
     }
 
-    private void checkCellX(){
-        if( x < (LauncherSettings.mCountX - 0.5) * LauncherSettings.ICON_WIDTH){
-            int xIndex =  (int) x/LauncherSettings.ICON_WIDTH;
-            if (x%LauncherSettings.ICON_WIDTH < LauncherSettings.ICON_WIDTH/2){
+    private void checkCellX() {
+        if (x < (LauncherSettings.mCountX - 0.5) * LauncherSettings.ICON_WIDTH) {
+            int xIndex = (int) x / LauncherSettings.ICON_WIDTH;
+            if (x % LauncherSettings.ICON_WIDTH < LauncherSettings.ICON_WIDTH / 2) {
                 newCellX = xIndex;
             } else {
                 newCellX = xIndex + 1;
             }
-        }else {
+        } else {
             newCellX = LauncherSettings.mCountX - 1;
         }
     }
 
-    private void checkCellY(){
-        if(y < LauncherSettings.WORKSPACE_TOPPADDING+LauncherSettings.WORKSPACE_HEIGHT){
-            if(y < (LauncherSettings.mCountY - 0.5) * LauncherSettings.ICON_HEIGHT+LauncherSettings.WORKSPACE_TOPPADDING*2){
-                if( (x>=0 && x<= Launcher.mScreenW) && ( y>=0 && y<=(LauncherSettings.WORKSPACE_TOPPADDING*2) )){
-                    Log.i("-------","卸载");
+    private void checkCellY() {
+        if (y < LauncherSettings.WORKSPACE_TOPPADDING + LauncherSettings.WORKSPACE_HEIGHT) {
+            if (y < (LauncherSettings.mCountY - 0.5) * LauncherSettings.ICON_HEIGHT + LauncherSettings.WORKSPACE_TOPPADDING * 2) {
+                if ((x >= 0 && x <= Launcher.mScreenW) && (y >= 0 && y <= (LauncherSettings.WORKSPACE_TOPPADDING * 2))) {
+                    Log.i("-------", "卸载");
                     uninstall();
-                }else if( y < ( LauncherSettings.WORKSPACE_TOPPADDING*2+LauncherSettings.ICON_HEIGHT/2)){
+                } else if (y < (LauncherSettings.WORKSPACE_TOPPADDING * 2 + LauncherSettings.ICON_HEIGHT / 2)) {
                     newCellY = 0;
                 } else {
-                    int yIndex = (int)(y - LauncherSettings.WORKSPACE_TOPPADDING*2)/LauncherSettings.ICON_HEIGHT;
-                    if( (y - LauncherSettings.WORKSPACE_TOPPADDING*2)%LauncherSettings.ICON_HEIGHT < LauncherSettings.ICON_HEIGHT/2){
-                        newCellY= yIndex;
-                    }else {
+                    int yIndex = (int) (y - LauncherSettings.WORKSPACE_TOPPADDING * 2) / LauncherSettings.ICON_HEIGHT;
+                    if ((y - LauncherSettings.WORKSPACE_TOPPADDING * 2) % LauncherSettings.ICON_HEIGHT < LauncherSettings.ICON_HEIGHT / 2) {
+                        newCellY = yIndex;
+                    } else {
                         newCellY = yIndex + 1;
                     }
                 }
-            }else {
+            } else {
                 newCellY = LauncherSettings.mCountY - 1;
             }
         } else {
-            Log.i("-------","移动到hotset");
+            Log.i("-------", "移动到hotset");
             moveToHotSet();
         }
     }
 
-    private void moveView(){
-        Log.i("--contains-----",(locationMarker.contains(newScreenId*100+newCellY*10+newCellX ))+"");
-        if( !locationMarker.contains(newScreenId*100+newCellY*10+newCellX )){
-            Log.i("--trsPageFlag-----",trsPageFlag+"翻页");
-            if(trsPageFlag){
-                locationMarker.remove((int)itemInfo.screenId*100+itemInfo.cellY*10+itemInfo.cellX);
-                locationMarker.add(newScreenId*100 + newCellY*10 +newCellX);
+    private void moveView() {
+        Log.i("--contains-----", (locationMarker.contains(newScreenId * 100 + newCellY * 10 + newCellX)) + "");
+        if (!locationMarker.contains(newScreenId * 100 + newCellY * 10 + newCellX)) {
+            Log.i("--trsPageFlag-----", trsPageFlag + "翻页");
+            if (trsPageFlag) {
+                locationMarker.remove((int) itemInfo.screenId * 100 + itemInfo.cellY * 10 + itemInfo.cellX);
+                locationMarker.add(newScreenId * 100 + newCellY * 10 + newCellX);
                 itemInfo.cellX = newCellX;
                 itemInfo.cellY = newCellY;
                 itemInfo.screenId = newScreenId;
                 itemInfo.screenId = newScreenId;
                 itemInfo.initCellX = newCellX;
                 itemInfo.initCellY = newCellY;
-                CellLayout cellLayout = (CellLayout) workspace.getChildAt(workspace.getCurrentPage()-1);
-                ShortcutAndWidgetContainer container = (ShortcutAndWidgetContainer)cellLayout.getChildAt(0);
-                Log.i("--removeView-----","removeView favorite ");
+                CellLayout cellLayout = (CellLayout) workspace.getChildAt(workspace.getCurrentPage() - 1);
+                ShortcutAndWidgetContainer container = (ShortcutAndWidgetContainer) cellLayout.getChildAt(0);
+                Log.i("--removeView-----", "removeView favorite ");
                 container.removeView(favorite);
                 reAddFavorite();
 
 
-            }else {
-                favorite.setTranslationX( (newCellX- itemInfo.initCellX) * LauncherSettings.ICON_WIDTH);
-                favorite.setTranslationY( (newCellY -itemInfo.initCellY)  * LauncherSettings.ICON_HEIGHT );
+            } else {
+                favorite.setTranslationX((newCellX - itemInfo.initCellX) * LauncherSettings.ICON_WIDTH);
+                favorite.setTranslationY((newCellY - itemInfo.initCellY) * LauncherSettings.ICON_HEIGHT);
                 favorite.invalidate();
-                locationMarker.remove((int)itemInfo.screenId*100+itemInfo.cellY*10+itemInfo.cellX);
-                locationMarker.add(newScreenId*100 + newCellY*10 +newCellX);
+                locationMarker.remove((int) itemInfo.screenId * 100 + itemInfo.cellY * 10 + itemInfo.cellX);
+                locationMarker.add(newScreenId * 100 + newCellY * 10 + newCellX);
 
                 itemInfo.cellX = newCellX;
                 itemInfo.cellY = newCellY;
@@ -197,11 +197,12 @@ public class DragView extends View {
             favorite.setVisibility(VISIBLE);
         }
         dragLayer.removeView(DragView.this);
-        Log.i("--newcellx-----",newCellX+"");
-        Log.i("-----newcelly--",""+newCellY);
-        Log.i("----newscreenid---",""+newScreenId);
+        Log.i("--newcellx-----", newCellX + "");
+        Log.i("-----newcelly--", "" + newCellY);
+        Log.i("----newscreenid---", "" + newScreenId);
 
     }
+
     private void reAddFavorite() {
         ShortcutInfo info = (ShortcutInfo) itemInfo;
         View shortcut = launcher.createShortcut(info, i);

@@ -65,7 +65,8 @@ public class ItemInfo {
      */
     CharSequence contentDescription;
 
-    ItemInfo() {}
+    ItemInfo() {
+    }
 
     ItemInfo(ItemInfo info) {
         copyFrom(info);

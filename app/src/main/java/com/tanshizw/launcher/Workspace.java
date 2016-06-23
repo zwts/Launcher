@@ -115,10 +115,10 @@ public class Workspace extends SmoothPagedView implements Insettable{
             throw new RuntimeException("Screen id " + screenId + " already exists!");
         }
         CellLayout newScreen = (CellLayout)
-                mLauncher.getLayoutInflater().inflate(R.layout.workspace_screen, null);
+                mLauncher.getLayoutInflater().inflate(R.layout.workspace_screen, null); // use this instead of null
         mWorkspaceScreens.put(screenId, newScreen);
         addView(newScreen, getChildCount());
         Log.v(TAG, "insertNewWorkspaceScreen getChildCount() = " + getChildCount());
-        return screenId;
+        return screenId;   // why return this screenId?
     }
 }
