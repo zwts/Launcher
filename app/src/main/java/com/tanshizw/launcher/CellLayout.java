@@ -34,9 +34,11 @@ public class CellLayout extends ViewGroup {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         Log.v(TAG, "onLayout l = " + l + "; t = " + t + "; r = " + r + "; b = " + b);
+        int x = 0;
+        int y = 0;
         for(int i = 0; i < getChildCount(); i++){
-            final View child = getChildAt(getChildCount() - i - 1);
-            child.layout(l, t, r, b);
+            final View child = getChildAt(i);
+            child.layout(x, y, LauncherSettings.SCREEN_WIDTH, b);
         }
     }
 
