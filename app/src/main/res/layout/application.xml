@@ -14,6 +14,6 @@
      limitations under the License.
 -->
 
-<com.tanshizw.launcher.BubbleTextView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tanshizw.launcher.items.BubbleTextView xmlns:android="http://schemas.android.com/apk/res/android"
    style="@style/WorkspaceIcon"
    android:focusable="true" />

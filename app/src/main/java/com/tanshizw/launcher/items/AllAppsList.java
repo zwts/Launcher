@@ -1,4 +1,4 @@
-package com.tanshizw.launcher;
+package com.tanshizw.launcher.items;
 
 import android.content.ComponentName;
 

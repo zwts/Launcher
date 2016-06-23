@@ -1,16 +1,16 @@
-package com.tanshizw.launcher;
+package com.tanshizw.launcher.items;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 
 /**
- * Created by user on 6/8/16.
+ * Represents a launchable icon on the workspaces an in folders.
  */
-public class ShortcutInfo extends ItemInfo{
+public class ShortcutInfo extends ItemInfo {
     /**
      * The intent used to start the application.
      */
-    Intent intent;
+    public Intent intent;
 
     /**
      * The application icon.

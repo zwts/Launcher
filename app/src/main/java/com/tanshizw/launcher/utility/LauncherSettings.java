@@ -1,9 +1,7 @@
-package com.tanshizw.launcher.Utility;
-
-import java.lang.reflect.Array;
+package com.tanshizw.launcher.utility;
 
 /**
- * Created by user on 6/15/16.
+ *  Keep configurations of launcher
  */
 final public class LauncherSettings {
     //every ITEMS_CHUNK to handle in a thread
@@ -28,7 +26,7 @@ final public class LauncherSettings {
     public static final int ICON_HEIGHT = 160;
     //icon padding
     public static final int ICON_PADDING = 0;
-    //mCountX cells in horizental
+    //mCountX cells in horizontal
     public static final int mCountX = 6;
     //mCountY cells in vertical
     public static final int mCountY = 6;

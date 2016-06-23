@@ -8,9 +8,6 @@ import android.widget.ImageView;
 
 import com.tanshizw.launcher.R;
 
-/**
- * Created by user on 6/13/16.
- */
 public class PageIndicatorMarker extends FrameLayout{
     private ImageView mActiveMarker;
     private ImageView mInactiveMarker;

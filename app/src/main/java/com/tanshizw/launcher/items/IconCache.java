@@ -1,20 +1,22 @@
-package com.tanshizw.launcher;
+package com.tanshizw.launcher.items;
 
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+
+import com.tanshizw.launcher.compat.LauncherActivityInfoCompat;
+import com.tanshizw.launcher.compat.LauncherAppsCompat;
+import com.tanshizw.launcher.utility.Utilities;
 
 import java.util.HashMap;
 
 /**
- * Created by archermind on 6/13/16.
+ * Cache of application icons.
  */
 public class IconCache {
     private Context mContext;
-    private PackageManager mPackageManager;
     private LauncherAppsCompat mLauncherApps;
     private int mIconDpi;
 
@@ -51,7 +53,6 @@ public class IconCache {
                 (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 
         mContext = context;
-        mPackageManager = context.getPackageManager();
         mLauncherApps = LauncherAppsCompat.getInstance(mContext);
         mIconDpi = activityManager.getLauncherLargeIconDensity();
     }

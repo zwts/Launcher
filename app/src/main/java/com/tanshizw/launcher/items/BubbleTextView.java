@@ -1,4 +1,4 @@
-package com.tanshizw.launcher;
+package com.tanshizw.launcher.items;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -7,8 +7,11 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.tanshizw.launcher.utility.FastBitmapDrawable;
+import com.tanshizw.launcher.utility.Utilities;
+
 /**
- * Created by user on 6/8/16.
+ * Every item we draw in workspaces is a BubbleTextView
  */
 public class BubbleTextView extends TextView {
     private int mTextColor;
@@ -34,14 +37,12 @@ public class BubbleTextView extends TextView {
 
         setCompoundDrawables(null, iconDrawable, null, null);
         if (setDefaultPadding) {
-            /*DeviceProfile grid = app.getDynamicGrid().getDeviceProfile();*/
             setCompoundDrawablePadding(ICON_TEXT_PADING);
         }
         if (info.contentDescription != null) {
             setContentDescription(info.contentDescription);
         }
         setText(info.title);
-        Log.v(TAG, "applyFromShortcutInfo info.title = " + info.title);
         setTag(info);
     }
 

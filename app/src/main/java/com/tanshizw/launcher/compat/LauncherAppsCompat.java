@@ -1,4 +1,4 @@
-package com.tanshizw.launcher;
+package com.tanshizw.launcher.compat;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by archermind on 6/13/16.
+ * The Launcher application instance
  */
 public class LauncherAppsCompat {
     private PackageManager mPm;
@@ -37,7 +37,7 @@ public class LauncherAppsCompat {
     public List<LauncherActivityInfoCompat> getActivityList(String packageName) {
         final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        mainIntent.setPackage(packageName);
+
         List<ResolveInfo> infos = mPm.queryIntentActivities(mainIntent, 0);
         List<LauncherActivityInfoCompat> list =
                 new ArrayList<LauncherActivityInfoCompat>(infos.size());

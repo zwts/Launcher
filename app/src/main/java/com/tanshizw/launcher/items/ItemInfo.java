@@ -1,7 +1,7 @@
-package com.tanshizw.launcher;
+package com.tanshizw.launcher.items;
 
 /**
- * Created by user on 6/8/16.
+ * Represents an item in the launcher.
  */
 public class ItemInfo {
     static final int NO_ID = -1;
@@ -49,7 +49,7 @@ public class ItemInfo {
     /**
      * Indicates the Y cell span.
      */
-    int spanY = 1;
+    public int spanY = 1;
 
     /**
      * Title of the item

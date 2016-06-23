@@ -1,20 +1,22 @@
-package com.tanshizw.launcher;
+package com.tanshizw.launcher.items;
 
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 
+import com.tanshizw.launcher.compat.LauncherActivityInfoCompat;
+
 import java.util.HashMap;
 
 /**
- * Created by archermind on 6/13/16.
+ * Represents an app in launcher
  */
-public class AppInfo extends ItemInfo{
+public class AppInfo extends ItemInfo {
     /**
      * The intent used to start the application.
      */
-    Intent intent;
+    public Intent intent;
 
     /**
      * A bitmap version of the application icon.

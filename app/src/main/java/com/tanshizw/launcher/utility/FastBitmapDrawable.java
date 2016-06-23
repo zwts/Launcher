@@ -1,4 +1,4 @@
-package com.tanshizw.launcher;
+package com.tanshizw.launcher.utility;
 
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
@@ -16,7 +16,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.SparseArray;
 
-class FastBitmapDrawable extends Drawable {
+public class FastBitmapDrawable extends Drawable {
 
     static final TimeInterpolator CLICK_FEEDBACK_INTERPOLATOR = new TimeInterpolator() {
 
