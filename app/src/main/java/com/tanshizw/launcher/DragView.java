@@ -169,6 +169,9 @@ public class DragView extends View {
                 itemInfo.cellX = newCellX;
                 itemInfo.cellY = newCellY;
                 itemInfo.screenId = newScreenId;
+                itemInfo.screenId = newScreenId;
+                itemInfo.initCellX = newCellX;
+                itemInfo.initCellY = newCellY;
                 CellLayout cellLayout = (CellLayout) workspace.getChildAt(workspace.getCurrentPage()-1);
                 ShortcutAndWidgetContainer container = (ShortcutAndWidgetContainer)cellLayout.getChildAt(0);
                 Log.i("--removeView-----","removeView favorite ");
