@@ -51,6 +51,10 @@ public class ItemInfo {
      */
     public int spanY = 1;
 
+    public int initCellX = -1;
+    public int initCellY = -1;
+    public int initScreenId = -1;
+
     /**
      * Title of the item
      */

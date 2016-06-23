@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -52,6 +54,10 @@ public class Launcher extends Activity implements View.OnClickListener {
     static final int ITEM_TYPE_SHORTCUT = 1;
     private final String TAG = "Launcher";
 
+    public static int mScreenW;
+    public static  int mScreenH;
+    private HashSet<Integer> locationMarker = new HashSet<Integer>();
+
     @Override
     protected void onCreate(Bundle saveInstanceState) {
         super.onCreate(saveInstanceState);
@@ -67,6 +73,8 @@ public class Launcher extends Activity implements View.OnClickListener {
         mWorkspace = (Workspace) mDragLayer.findViewById(R.id.workspace);
         mHotseat = (Hotseat) mDragLayer.findViewById(R.id.hot_seat);
         mIsSafeModeEnabled = getPackageManager().isSafeMode();
+        mScreenW = this.getWindowManager().getDefaultDisplay().getWidth();
+        mScreenH = this.getWindowManager().getDefaultDisplay().getHeight();
 
         Utilities.setupScreenSizeSettings(this);
         bindWorkspaceScreens();
@@ -80,7 +88,6 @@ public class Launcher extends Activity implements View.OnClickListener {
         orderedScreenIds.add(screenId);
         orderedScreenIds.add(screenId + 1);
         bindAddScreens(orderedScreenIds);
-
     }
 
     /**
@@ -151,13 +158,19 @@ public class Launcher extends Activity implements View.OnClickListener {
 
             shortcut.container = LauncherSettings.CONTAINER_DESKTOP;
             shortcut.itemType = ITEM_TYPE_SHORTCUT;
-            shortcut.screenId = 1;
+            shortcut.screenId = 0;
             shortcut.id = 0;
             shortcut.cellX = i % LauncherSettings.mCountX;
             shortcut.cellY = i / LauncherSettings.mCountX;
+            shortcut.initCellX = shortcut.cellX;
+            shortcut.initCellY = shortcut.cellY;
+            shortcut.initScreenId = (int)shortcut.screenId;
             shortcut.spanX = 1;
             shortcut.spanY = 1;
+
             workspaceItems.add(shortcut);
+            locationMarker.add((int)shortcut.screenId*100+shortcut.cellY*10+shortcut.cellX);
+
     }
 
     private boolean isHotseatApp(AppInfo info) {
@@ -253,18 +266,27 @@ public class Launcher extends Activity implements View.OnClickListener {
      * @return A BubbleTextView inflated from R.layout.application
      * which will display in workspace and hotseat.
      */
-    View createShortcut(int layoutResId, ViewGroup parent, ShortcutInfo info) {
+    View createShortcut(final int layoutResId, ViewGroup parent, final ShortcutInfo info, final int i) {
         Log.v(TAG, "createShortcut");
-        BubbleTextView favorite = (BubbleTextView) mInflater.inflate(layoutResId, parent, false);
+        final BubbleTextView favorite = (BubbleTextView) mInflater.inflate(layoutResId, parent, false);
         favorite.applyFromShortcutInfo(info, mIconCache, true);
         favorite.setOnClickListener(this);
         //favorite.setOnFocusChangeListener(mFocusHandler);
+        favorite.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                favorite.setVisibility(View.GONE);
+                DragView dragView = new DragView(Launcher.this,favorite,mDragLayer,workspaceItems.get(i),info.getIcon(),locationMarker,mWorkspace,i);
+                dragView.show();
+                return true;
+            }
+        });
         return favorite;
     }
 
-    View createShortcut(ShortcutInfo info) {
+    View createShortcut(ShortcutInfo info ,int i) {
         return createShortcut(R.layout.application,
-                (ViewGroup) mWorkspace.getChildAt(mWorkspace.getCurrentPage()), info);
+                (ViewGroup) mWorkspace.getChildAt(mWorkspace.getCurrentPage()), info, i);
     }
 
     /**
@@ -281,7 +303,7 @@ public class Launcher extends Activity implements View.OnClickListener {
                 case ITEM_TYPE_APPLICATION:
                 case ITEM_TYPE_SHORTCUT:
                     ShortcutInfo info = (ShortcutInfo) item;
-                    View shortcut = createShortcut(info);//BubbleTextView
+                    View shortcut = createShortcut(info, i);//BubbleTextView
                     mWorkspace.addInScreenFromBind(shortcut, item.container, item.screenId, item.cellX,
                             item.cellY, item.spanX, item.spanY);
 
@@ -402,4 +424,5 @@ public class Launcher extends Activity implements View.OnClickListener {
     public Hotseat getHotseat() {
         return mHotseat;
     }
+
 }
