@@ -5,12 +5,11 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
-import com.tanshizw.launcher.Utility.LauncherSettings;
+import com.tanshizw.launcher.utility.LauncherSettings;
 
 /**
- * Created by user on 6/6/16.
+ * Custom control to display at the bottom of screen, set applications in common use
  */
 public class Hotseat extends ViewGroup{
     private final String TAG = "Hotseat";

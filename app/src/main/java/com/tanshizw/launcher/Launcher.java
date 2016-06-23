@@ -7,13 +7,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-import com.tanshizw.launcher.Utility.LauncherSettings;
+
+import com.tanshizw.launcher.compat.LauncherActivityInfoCompat;
+import com.tanshizw.launcher.compat.LauncherAppsCompat;
+import com.tanshizw.launcher.items.AllAppsList;
+import com.tanshizw.launcher.items.AppInfo;
+import com.tanshizw.launcher.items.BubbleTextView;
+import com.tanshizw.launcher.items.IconCache;
+import com.tanshizw.launcher.items.ItemInfo;
+import com.tanshizw.launcher.items.ShortcutInfo;
+import com.tanshizw.launcher.utility.LauncherSettings;
+import com.tanshizw.launcher.utility.Utilities;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -22,9 +31,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Default launcher application
+ */
 public class Launcher extends Activity implements View.OnClickListener {
     private IconCache mIconCache;
-    private AllAppsList mBgAllAppsList;
+    private AllAppsList mAllAppsList;
     private LauncherAppsCompat mLauncherApps;
     private HashMap<Object, CharSequence> mLabelCache;
     private Context mContext;
@@ -41,53 +53,52 @@ public class Launcher extends Activity implements View.OnClickListener {
     private final String TAG = "Launcher";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_launcher);
-        Log.v(TAG, "onCreate");
-
-        mInflater = getLayoutInflater();
-        mIsSafeModeEnabled = getPackageManager().isSafeMode();
-
-        DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-        LauncherSettings.SCREEN_WIDTH = dm.widthPixels;
-        LauncherSettings.SCREEN_HEIGHT = dm.heightPixels;
-        Log.v(TAG, "dm.widthPixels = " + dm.widthPixels);
-
-        setupViews();
-
-        Long screenId = Long.valueOf(0);
-        orderedScreenIds.add(screenId);
-        orderedScreenIds.add(screenId + 1);//two screens
-        bindAddScreens(orderedScreenIds);
-
-        addHotseatLayout();
-
-        setupWorkspaceItems();
+    protected void onCreate(Bundle saveInstanceState) {
+        super.onCreate(saveInstanceState);
+        setContentView(R.layout.launcher);
+        init();
     }
 
-    /**
-     * Finds all the views we need.
-     */
-    private void setupViews() {
+    private void init() {
+        mContext = getApplicationContext();
+        mInflater = getLayoutInflater();
+        mLauncherApps = LauncherAppsCompat.getInstance(this);
         mDragLayer = (DragLayer) findViewById(R.id.drag_layer);
         mWorkspace = (Workspace) mDragLayer.findViewById(R.id.workspace);
         mHotseat = (Hotseat) mDragLayer.findViewById(R.id.hot_seat);
+        mIsSafeModeEnabled = getPackageManager().isSafeMode();
+
+        Utilities.setupScreenSizeSettings(this);
+        bindWorkspaceScreens();
+        bindHotseatLayout();
+
+        setupAllAppItems();
+    }
+
+    private void bindWorkspaceScreens() {
+        Long screenId = Long.valueOf(0);
+        orderedScreenIds.add(screenId);
+        orderedScreenIds.add(screenId + 1);
+        bindAddScreens(orderedScreenIds);
+
     }
 
     /**
      * Prepare all items.
      */
-    private void setupWorkspaceItems() {
-        int hotseatAppNum = 0;
-        int desktopAppNum = 0;
+    private void setupAllAppItems() {
         mIconCache = new IconCache(this);
-        mBgAllAppsList = new AllAppsList(mIconCache);
-        mLauncherApps = LauncherAppsCompat.getInstance(this);
         mLabelCache = new HashMap<Object, CharSequence>();
-        mContext = getApplicationContext();
+        mAllAppsList = new AllAppsList(mIconCache);
 
+        fillAllAppsList();
+        applyAllApps();
+    }
+
+    /**
+     * Get all applications from launcher instance
+     */
+    private void fillAllAppsList() {
         List<LauncherActivityInfoCompat> apps = mLauncherApps.getActivityList(null);
         if (apps == null || apps.isEmpty()) {
             return;
@@ -98,11 +109,18 @@ public class Launcher extends Activity implements View.OnClickListener {
         for (int i = 0; i < apps.size(); i++) {
             LauncherActivityInfoCompat app = apps.get(i);
             // This builds the icon bitmaps.
-            mBgAllAppsList.add(new AppInfo(mContext, app, mIconCache, mLabelCache));
+            mAllAppsList.add(new AppInfo(mContext, app, mIconCache, mLabelCache));
         }
+    }
 
-        for (int i = 0; i < mBgAllAppsList.size(); i++) {
-            AppInfo info = mBgAllAppsList.get(i);
+    /**
+     * Set all apps as shortcuts to workspaces
+     */
+    private void applyAllApps() {
+        int hotseatAppNum = 0;
+        int desktopAppNum = 0;
+        for (int i = 0; i < mAllAppsList.size(); i++) {
+            AppInfo info = mAllAppsList.get(i);
             if (isHotseatApp(info)) {
                 applyHotseatApps(info, hotseatAppNum);
                 hotseatAppNum ++;
@@ -111,7 +129,6 @@ public class Launcher extends Activity implements View.OnClickListener {
                 desktopAppNum ++;
             }
         }
-
         bindWorkspaceItems(workspaceItems);
     }
 
@@ -134,7 +151,7 @@ public class Launcher extends Activity implements View.OnClickListener {
 
             shortcut.container = LauncherSettings.CONTAINER_DESKTOP;
             shortcut.itemType = ITEM_TYPE_SHORTCUT;
-            shortcut.screenId = 0;
+            shortcut.screenId = 1;
             shortcut.id = 0;
             shortcut.cellX = i % LauncherSettings.mCountX;
             shortcut.cellY = i / LauncherSettings.mCountX;
@@ -154,6 +171,9 @@ public class Launcher extends Activity implements View.OnClickListener {
         return false;
     }
 
+    /**
+     * A comparator to sort mAllAppsList
+     */
     public static class ShortcutNameComparator implements Comparator<LauncherActivityInfoCompat> {
         private Collator mCollator;
         private HashMap<Object, CharSequence> mLabelCache;
@@ -195,7 +215,10 @@ public class Launcher extends Activity implements View.OnClickListener {
         }
     }
 
-    public void addHotseatLayout() {
+    /**
+     * Add cell layout in hot seat.
+     */
+    private void bindHotseatLayout() {
         mHotseat.insertHotseatLayout();
     }
 

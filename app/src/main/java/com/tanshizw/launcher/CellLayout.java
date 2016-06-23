@@ -8,7 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.tanshizw.launcher.Utility.LauncherSettings;
+import com.tanshizw.launcher.items.BubbleTextView;
+import com.tanshizw.launcher.items.ItemInfo;
+import com.tanshizw.launcher.utility.LauncherSettings;
 
 /**
  * Created by user on 6/6/16.

@@ -1,4 +1,4 @@
-package com.tanshizw.launcher;
+package com.tanshizw.launcher.compat;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -8,9 +8,6 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 
-/**
- * Created by archermind on 6/13/16.
- */
 public class LauncherActivityInfoCompat {
     private ActivityInfo mActivityInfo;
     private ComponentName mComponentName;

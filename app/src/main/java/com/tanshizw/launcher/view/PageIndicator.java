@@ -12,9 +12,6 @@ import com.tanshizw.launcher.R;
 
 import java.util.ArrayList;
 
-/**
- * Created by user on 6/13/16.
- */
 public class PageIndicator extends LinearLayout {
     private static final String TAG = "PageIndicator";
     private ArrayList<PageIndicatorMarker> mMarkers = new ArrayList<PageIndicatorMarker>();

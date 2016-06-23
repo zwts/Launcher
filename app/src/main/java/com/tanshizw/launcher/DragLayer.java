@@ -4,14 +4,13 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.tanshizw.launcher.Utility.LauncherSettings;
+import com.tanshizw.launcher.utility.LauncherSettings;
 import com.tanshizw.launcher.view.PageIndicator;
 
 /**
- * Created by user on 6/7/16.
+ * A ViewGroup that coordinates dragging across its descendants
  */
 public class DragLayer extends FrameLayout{
 
