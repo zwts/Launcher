@@ -14,13 +14,12 @@ import com.tanshizw.launcher.utility.Utilities;
  * Every item we draw in workspaces is a BubbleTextView
  */
 public class BubbleTextView extends TextView {
-    private int mTextColor;
-    private boolean mIsTextVisible;
-    private final int ICON_TEXT_PADING = 10;
     private final String TAG = "BubbleTextView";
+
+    private final int ICON_TEXT_PADING = 10;
     public BubbleTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
-            Log.v(TAG, "BubbleTextView");
+        Log.v(TAG, "BubbleTextView");
     }
 
     public void applyFromShortcutInfo(ShortcutInfo info, IconCache iconCache,
@@ -30,7 +29,7 @@ public class BubbleTextView extends TextView {
 
 
     public void applyFromShortcutInfo(ShortcutInfo info, IconCache iconCache,
-                                      boolean setDefaultPadding, boolean promiseStateChanged ) {
+                                      boolean setDefaultPadding, boolean promiseStateChanged) {
         Bitmap b = info.getIcon(iconCache);
 
         FastBitmapDrawable iconDrawable = Utilities.createIconDrawable(b);
@@ -48,7 +47,6 @@ public class BubbleTextView extends TextView {
 
     @Override
     public void setTextColor(int color) {
-        mTextColor = color;
         super.setTextColor(color);
     }
 
@@ -59,7 +57,6 @@ public class BubbleTextView extends TextView {
         } else {
             super.setTextColor(res.getColor(android.R.color.transparent));
         }
-        mIsTextVisible = visible;
     }
 
 

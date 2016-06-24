@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.tanshizw.launcher.items.BubbleTextView;
 import com.tanshizw.launcher.items.ItemInfo;
-import com.tanshizw.launcher.utility.LauncherSettings;
 
 /**
  * Created by user on 6/6/16.
@@ -38,7 +37,7 @@ public class CellLayout extends ViewGroup {
         Log.v(TAG, "onLayout l = " + l + "; t = " + t + "; r = " + r + "; b = " + b);
         int x = 0;
         int y = 0;
-        for(int i = 0; i < getChildCount(); i++){
+        for (int i = 0; i < getChildCount(); i++) {
             final View child = getChildAt(i);
             child.layout(x, y, LauncherSettings.SCREEN_WIDTH, b);
         }
@@ -66,9 +65,9 @@ public class CellLayout extends ViewGroup {
             ItemInfo info = (ItemInfo) child.getTag();
             Log.v(TAG, "addViewToCellLayout BubbleTextView");
             BubbleTextView bubbleChild = (BubbleTextView) child;
-            if(info.container == LauncherSettings.CONTAINER_DESKTOP){
+            if (info.container == LauncherSettings.CONTAINER_DESKTOP) {
                 bubbleChild.setTextVisibility(true);
-            }else if(info.container == LauncherSettings.CONTAINER_HOTSEAT){
+            } else if (info.container == LauncherSettings.CONTAINER_HOTSEAT) {
                 bubbleChild.setTextVisibility(false);
             }
         }
@@ -78,7 +77,7 @@ public class CellLayout extends ViewGroup {
             if (lp.cellVSpan < 0) lp.cellVSpan = mCountY;
 
             mShortcutsAndWidgets.addView(child, index, lp);
-            Log.v(TAG, "addView child.getText = " + ((TextView)child).getText());
+            Log.v(TAG, "addView child.getText = " + ((TextView) child).getText());
 
             mShortcutsAndWidgets.measureChild(child);
 
@@ -108,7 +107,7 @@ public class CellLayout extends ViewGroup {
         }
     }
 
-    public static class LayoutParams extends ViewGroup.MarginLayoutParams{
+    public static class LayoutParams extends ViewGroup.MarginLayoutParams {
         /**
          * Horizontal location of the item in the grid.
          */

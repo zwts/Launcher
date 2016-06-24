@@ -9,7 +9,6 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.tanshizw.launcher.items.ShortcutInfo;
-import com.tanshizw.launcher.utility.LauncherSettings;
 import com.tanshizw.launcher.items.BubbleTextView;
 import com.tanshizw.launcher.items.ItemInfo;
 
@@ -17,7 +16,7 @@ import java.util.HashSet;
 
 /**
  * Created by sdduser on 6/17/16. DragView dragView = new DragView(Launcher.this,favorite,mDragLayer,workspaceItems.get(i),info.getIcon());
-                dragView.show();
+ * dragView.show();
  */
 public class DragView extends View {
     private BubbleTextView favorite;
@@ -41,7 +40,8 @@ public class DragView extends View {
 
 
 
-    public DragView(Context context, BubbleTextView favorite, DragLayer dragLayer, ItemInfo itemInfo, Bitmap bitmap,HashSet<Integer> locationMarker,Workspace workspace,int i ) {
+    public DragView(Context context, BubbleTextView favorite, DragLayer dragLayer, ItemInfo itemInfo,
+                    Bitmap bitmap, HashSet<Integer> locationMarker, Workspace workspace, int i) {
         super(context);
         this.favorite = favorite;
         this.dragLayer = dragLayer;
@@ -49,7 +49,7 @@ public class DragView extends View {
         this.bitmap = bitmap;
         this.locationMarker = locationMarker;
         this.workspace = workspace;
-        this.launcher = (Launcher)context;
+        this.launcher = (Launcher) context;
         this.i = i;
 
         paint = new Paint();
@@ -62,52 +62,48 @@ public class DragView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawBitmap(bitmap,x,y,paint);
+        canvas.drawBitmap(bitmap, x, y, paint);
     }
 
-    public void show(){
+    public void show() {
         dragLayer.addView(DragView.this);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         super.onTouchEvent(event);
-        switch (event.getAction()){
+        switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 x = event.getX();
                 y = event.getY();
-                Log.i("ACTION_DOWN","====xxxx=="+event.getX()+"+++YYY"+event.getY());
+                Log.i("ACTION_DOWN", "====xxxx==" + event.getX() + "+++YYY" + event.getY());
                 postInvalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
                 x = event.getX();
                 y = event.getY();
-                Log.i("ACTION_MOVE","========xxxx=="+event.getX()+"+++YYY"+event.getY());
+                Log.i("ACTION_MOVE", "========xxxx==" + event.getX() + "+++YYY" + event.getY());
                 move();
                 postInvalidate();
-
                 break;
             case MotionEvent.ACTION_UP:
                 x = event.getX();
                 y = event.getY();
                 up();
-                Log.i("ACTION_UP","========xxxx=="+event.getX()+"+++YYY"+event.getY());
-
-
-
+                Log.i("ACTION_UP", "========xxxx==" + event.getX() + "+++YYY" + event.getY());
                 break;
         }
         return true;
     }
 
     private void move() {
-        Log.i("---------",workspace.getChildCount()+"CCC"+workspace.getCurrentPage());
-        if(x>=Launcher.mScreenW - halfOfIconWPx){
-            if(workspace.getCurrentPage()<=workspace.getChildCount()-1-1){
-                workspace.snapPage(workspace.getCurrentPage()+1);
+        Log.i("---------", workspace.getChildCount() + "CCC" + workspace.getCurrentPage());
+        if (x >= Launcher.mScreenW - halfOfIconWPx) {
+            if (workspace.getCurrentPage() <= workspace.getChildCount() - 1 - 1){
+                workspace.snapPage(workspace.getCurrentPage() + 1);
                 trsPageFlag = true;
-                Log.i("---------",workspace.getChildCount()+"CCC"+workspace.getCurrentPage());
-            }else{
+                Log.i("---------", workspace.getChildCount() + "CCC" + workspace.getCurrentPage());
+            } else {
                 //workspace.insertNewWorkspaceScreen(workspace.getCurrentPage()+1);
             }
         }

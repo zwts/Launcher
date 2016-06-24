@@ -9,7 +9,6 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -22,7 +21,6 @@ import com.tanshizw.launcher.items.BubbleTextView;
 import com.tanshizw.launcher.items.IconCache;
 import com.tanshizw.launcher.items.ItemInfo;
 import com.tanshizw.launcher.items.ShortcutInfo;
-import com.tanshizw.launcher.utility.LauncherSettings;
 import com.tanshizw.launcher.utility.Utilities;
 
 import java.text.Collator;
@@ -37,6 +35,7 @@ import java.util.List;
  * Default launcher application
  */
 public class Launcher extends Activity implements View.OnClickListener {
+    private final String TAG = "Launcher";
     private IconCache mIconCache;
     private AllAppsList mAllAppsList;
     private LauncherAppsCompat mLauncherApps;
@@ -47,15 +46,14 @@ public class Launcher extends Activity implements View.OnClickListener {
     DragLayer mDragLayer;
     Workspace mWorkspace;
     Hotseat mHotseat;
-    ArrayList<ItemInfo> workspaceItems = new ArrayList<ItemInfo>();
-    ArrayList<Long> orderedScreenIds = new ArrayList<Long>();
+    ArrayList<ItemInfo> workspaceItems = new ArrayList<>();
+    ArrayList<Long> orderedScreenIds = new ArrayList<>();
     private LayoutInflater mInflater;
     static final int ITEM_TYPE_APPLICATION = 0;
     static final int ITEM_TYPE_SHORTCUT = 1;
-    private final String TAG = "Launcher";
 
     public static int mScreenW;
-    public static  int mScreenH;
+    public static int mScreenH;
     private HashSet<Integer> locationMarker = new HashSet<Integer>();
 
     @Override
@@ -84,7 +82,7 @@ public class Launcher extends Activity implements View.OnClickListener {
     }
 
     private void bindWorkspaceScreens() {
-        Long screenId = Long.valueOf(0);
+        Long screenId = 0L;
         orderedScreenIds.add(screenId);
         orderedScreenIds.add(screenId + 1);
         bindAddScreens(orderedScreenIds);
@@ -96,7 +94,7 @@ public class Launcher extends Activity implements View.OnClickListener {
     private void setupAllAppItems() {
         mIconCache = new IconCache(this);
         mLabelCache = new HashMap<Object, CharSequence>();
-        mAllAppsList = new AllAppsList(mIconCache);
+        mAllAppsList = new AllAppsList();
 
         fillAllAppsList();
         applyAllApps();
@@ -130,53 +128,52 @@ public class Launcher extends Activity implements View.OnClickListener {
             AppInfo info = mAllAppsList.get(i);
             if (isHotseatApp(info)) {
                 applyHotseatApps(info, hotseatAppNum);
-                hotseatAppNum ++;
+                hotseatAppNum++;
             } else {
                 applyDesktopApps(info, desktopAppNum);
-                desktopAppNum ++;
+                desktopAppNum++;
             }
         }
         bindWorkspaceItems(workspaceItems);
     }
 
     private void applyHotseatApps(AppInfo info, int i) {
-            ShortcutInfo shortcut = new ShortcutInfo(info);
+        ShortcutInfo shortcut = new ShortcutInfo(info);
 
-            shortcut.container = LauncherSettings.CONTAINER_HOTSEAT;
-            shortcut.itemType = ITEM_TYPE_SHORTCUT;
-            shortcut.screenId = 0;
-            shortcut.id = 0;
-            shortcut.cellX = i;
-            shortcut.cellY = 0;
-            shortcut.spanX = 1;
-            shortcut.spanY = 1;
-            workspaceItems.add(shortcut);
+        shortcut.container = LauncherSettings.CONTAINER_HOTSEAT;
+        shortcut.itemType = ITEM_TYPE_SHORTCUT;
+        shortcut.screenId = 0;
+        shortcut.id = 0;
+        shortcut.cellX = i;
+        shortcut.cellY = 0;
+        shortcut.spanX = 1;
+        shortcut.spanY = 1;
+        workspaceItems.add(shortcut);
     }
 
     private void applyDesktopApps(AppInfo info, int i) {
-            ShortcutInfo shortcut = new ShortcutInfo(info);
+        ShortcutInfo shortcut = new ShortcutInfo(info);
 
-            shortcut.container = LauncherSettings.CONTAINER_DESKTOP;
-            shortcut.itemType = ITEM_TYPE_SHORTCUT;
-            shortcut.screenId = 0;
-            shortcut.id = 0;
-            shortcut.cellX = i % LauncherSettings.mCountX;
-            shortcut.cellY = i / LauncherSettings.mCountX;
-            shortcut.initCellX = shortcut.cellX;
-            shortcut.initCellY = shortcut.cellY;
-            shortcut.initScreenId = (int)shortcut.screenId;
-            shortcut.spanX = 1;
-            shortcut.spanY = 1;
+        shortcut.container = LauncherSettings.CONTAINER_DESKTOP;
+        shortcut.itemType = ITEM_TYPE_SHORTCUT;
+        shortcut.screenId = 0;
+        shortcut.id = 0;
+        shortcut.cellX = i % LauncherSettings.mCountX;
+        shortcut.cellY = i / LauncherSettings.mCountX;
+        shortcut.initCellX = shortcut.cellX;
+        shortcut.initCellY = shortcut.cellY;
+        shortcut.initScreenId = (int) shortcut.screenId;
+        shortcut.spanX = 1;
+        shortcut.spanY = 1;
 
-            workspaceItems.add(shortcut);
-            locationMarker.add((int)shortcut.screenId*100+shortcut.cellY*10+shortcut.cellX);
-
+        workspaceItems.add(shortcut);
+        locationMarker.add((int) shortcut.screenId * 100 + shortcut.cellY * 10 + shortcut.cellX);
     }
 
     private boolean isHotseatApp(AppInfo info) {
         final ComponentName component = info.intent.getComponent();
         String packageName = component.getPackageName();
-        for(int i = 0; i < LauncherSettings.HOTSET_APPS.length; i++ ) {
+        for (int i = 0; i < LauncherSettings.HOTSET_APPS.length; i++ ) {
             if (LauncherSettings.HOTSET_APPS[i].equals(packageName)) {
                 return true;
             }
@@ -276,7 +273,8 @@ public class Launcher extends Activity implements View.OnClickListener {
             @Override
             public boolean onLongClick(View view) {
                 favorite.setVisibility(View.GONE);
-                DragView dragView = new DragView(Launcher.this,favorite,mDragLayer,workspaceItems.get(i),info.getIcon(),locationMarker,mWorkspace,i);
+                DragView dragView = new DragView(Launcher.this, favorite, mDragLayer, workspaceItems.get(i),
+                        info.getIcon(), locationMarker,mWorkspace, i);
                 dragView.show();
                 return true;
             }
@@ -284,14 +282,14 @@ public class Launcher extends Activity implements View.OnClickListener {
         return favorite;
     }
 
-    View createShortcut(ShortcutInfo info ,int i) {
+    View createShortcut(ShortcutInfo info, int i) {
         return createShortcut(R.layout.application,
                 (ViewGroup) mWorkspace.getChildAt(mWorkspace.getCurrentPage()), info, i);
     }
 
     /**
      * Bind the items start-end from the list.
-     *
+     *<p/>
      * these item will added in workspace
      */
     public void bindItems(final ArrayList<ItemInfo> shortcuts, final int start, final int end) {
