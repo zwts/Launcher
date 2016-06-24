@@ -7,8 +7,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.tanshizw.launcher.utility.LauncherSettings;
-
 import java.util.HashMap;
 
 /**

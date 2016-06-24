@@ -6,12 +6,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.tanshizw.launcher.utility.LauncherSettings;
-
 /**
  * Custom control to display at the bottom of screen, set applications in common use
  */
-public class Hotseat extends ViewGroup{
+public class Hotseat extends ViewGroup {
     private final String TAG = "Hotseat";
     private CellLayout mContent;
     private Launcher mLauncher;
@@ -27,8 +25,8 @@ public class Hotseat extends ViewGroup{
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         Log.v(TAG, "onLayout l = " + l + "; t = " + t + "; r = " + r + "; b = " + b);
         int count = getChildCount();
-        for(int i = 0; i < count; i++){
-            View child = (View)getChildAt(i);
+        for (int i = 0; i < count; i++) {
+            View child = (View) getChildAt(i);
             int x = 0;
             int y = 0;
             child.layout(x, y, x + r, y + LauncherSettings.HOTSEAT_HEIGHT);

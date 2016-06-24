@@ -8,11 +8,12 @@ import android.widget.ImageView;
 
 import com.tanshizw.launcher.R;
 
-public class PageIndicatorMarker extends FrameLayout{
+public class PageIndicatorMarker extends FrameLayout {
     private ImageView mActiveMarker;
     private ImageView mInactiveMarker;
     private boolean mIsActive = false;
     private static final String TAG = "PageIndicatorMaker";
+
     public PageIndicatorMarker(Context context) {
         super(context);
     }
@@ -29,9 +30,10 @@ public class PageIndicatorMarker extends FrameLayout{
         Log.v(TAG, "onFinishInflate");
         mActiveMarker = (ImageView) findViewById(R.id.active);
         mInactiveMarker = (ImageView) findViewById(R.id.inactive);
+        super.onFinishInflate();
     }
 
-    void activate(){
+    void activate() {
         mActiveMarker.animate().cancel();
         mActiveMarker.setAlpha(1f);
         mActiveMarker.setScaleX(1f);
@@ -41,7 +43,7 @@ public class PageIndicatorMarker extends FrameLayout{
         mIsActive = true;
     }
 
-    void inactivate(){
+    void inactivate() {
         mInactiveMarker.animate().cancel();
         mInactiveMarker.setAlpha(1f);
         mActiveMarker.animate().cancel();

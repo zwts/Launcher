@@ -1,7 +1,7 @@
-package com.tanshizw.launcher.utility;
+package com.tanshizw.launcher;
 
 /**
- *  Keep configurations of launcher
+ * Keep configurations of launcher
  */
 final public class LauncherSettings {
     //every ITEMS_CHUNK to handle in a thread

@@ -8,13 +8,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.tanshizw.launcher.utility.LauncherSettings;
 import com.tanshizw.launcher.view.PageIndicator;
 
 /**
  * Created by user on 6/8/16.
  */
-public class SmoothPagedView  extends ViewGroup {
+public class SmoothPagedView extends ViewGroup {
     protected int mCurrentPage;
     private static final String TAG = "SmoothPagedView";
 
@@ -41,7 +40,7 @@ public class SmoothPagedView  extends ViewGroup {
                 R.styleable.PagedView, 0, 0);
         mPageIndicatorViewId = a.getResourceId(R.styleable.PagedView_pageIndicator, -1);
     }
-    public SmoothPagedView(Context context, AttributeSet attrs, int defStyle){
+    public SmoothPagedView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }
@@ -53,9 +52,9 @@ public class SmoothPagedView  extends ViewGroup {
         Log.v(TAG, "mCurrentPage = " + mCurrentPage);
         return mCurrentPage;
     }
-    void setCurrentPage(int index){
+    void setCurrentPage(int index) {
         Log.v(TAG, "setCurrentPage index = " + index);
-        if(index < getChildCount()){
+        if (index < getChildCount()) {
             mCurrentPage = index;
         }
     }
@@ -64,7 +63,7 @@ public class SmoothPagedView  extends ViewGroup {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         Log.v(TAG, "onLayout l = " + l + "; t = " + t + "; r = " + r + "; b = " + b);
         Log.v(TAG, "onLayout getChildCount() = " + getChildCount());
-        for(int i = 0; i < getChildCount(); i++){
+        for (int i = 0; i < getChildCount(); i++) {
             final View child = getChildAt(getChildCount() - i - 1);
             child.layout(l, t, r, b);
         }
@@ -73,10 +72,10 @@ public class SmoothPagedView  extends ViewGroup {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         ViewGroup grandParent = (ViewGroup) getParent();
-        if(grandParent instanceof DragLayer){
+        if (grandParent instanceof DragLayer) {
             Log.v(TAG, "onAttachedToWindow parent is DragLayer");
         }
-        if(mPageIndicator == null && mPageIndicatorViewId > -1){
+        if (mPageIndicator == null && mPageIndicatorViewId > -1) {
             mPageIndicator = (PageIndicator) grandParent.findViewById(mPageIndicatorViewId);
             mPageIndicator.setActiveMarkerIndex(mCurrentPage);
             mPageIndicator.removeAllMarkers();
@@ -106,46 +105,46 @@ public class SmoothPagedView  extends ViewGroup {
                 final float deltaX = mLastMotionX - x;
                 Log.v(TAG, "deltaX = " + deltaX);
                 Log.v(TAG, "mTouchState = " + mTouchState);
-                if(mTouchState == TOUCH_STATE_SCROLLING){
-                    if(Math.abs(deltaX) >= 1.0f) {
+                if (mTouchState == TOUCH_STATE_SCROLLING) {
+                    if (Math.abs(deltaX) >= 1.0f) {
                         scrollTo((int) (mCurrentPage * LauncherSettings.SCREEN_WIDTH + deltaX), 0);
                     }
-                    if(Math.abs(deltaX) >= LauncherSettings.SNAP_SCREEN_GAP){
-                        if(deltaX > 0 && canSnapNext()){
+                    if (Math.abs(deltaX) >= LauncherSettings.SNAP_SCREEN_GAP) {
+                        if (deltaX > 0 && canSnapNext()) {
                             mTouchState = TOUCH_STATE_NEXT_PAGE;
-                        }else if(deltaX < 0 && canSnapPrev()){
+                        } else if (deltaX < 0 && canSnapPrev()){
                             mTouchState = TOUCH_STATE_PREV_PAGE;
-                        }else{
+                        } else {
                             mTouchState = TOUCH_STATE_INVALIDE;
                         }
                     }
-                }else if(mTouchState == TOUCH_STATE_NEXT_PAGE || mTouchState == TOUCH_STATE_PREV_PAGE) {
-                    if(Math.abs(deltaX) >= 1.0f) {
+                } else if (mTouchState == TOUCH_STATE_NEXT_PAGE || mTouchState == TOUCH_STATE_PREV_PAGE) {
+                    if (Math.abs(deltaX) >= 1.0f) {
                         scrollTo((int) (mCurrentPage * LauncherSettings.SCREEN_WIDTH + deltaX), 0);
                     }
-                }else if(mTouchState == TOUCH_STATE_INVALIDE) {
+                } else if (mTouchState == TOUCH_STATE_INVALIDE) {
                     int constDeltaX;
-                    if(deltaX > 0){
+                    if(deltaX > 0) {
                         constDeltaX = LauncherSettings.SNAP_SCREEN_GAP;
-                    }else {
+                    } else {
                         constDeltaX = -LauncherSettings.SNAP_SCREEN_GAP;
                     }
                     scrollTo(mCurrentPage * LauncherSettings.SCREEN_WIDTH + constDeltaX, 0);
-                }else {
+                } else {
                     determineScrollingStart(ev);
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 int currentPage = getCurrentPage();
-                if(Math.abs(x - mLastMotionX) > (LauncherSettings.SCREEN_WIDTH / 2)) {
+                if (Math.abs(x - mLastMotionX) > (LauncherSettings.SCREEN_WIDTH / 2)) {
                     if (mTouchState == TOUCH_STATE_PREV_PAGE) {
                         Log.v(TAG, "need snap to prev page");
-                        if(currentPage > 0){
+                        if(currentPage > 0) {
                             currentPage--;
                         }
                     } else if (mTouchState == TOUCH_STATE_NEXT_PAGE) {
                         Log.v(TAG, "need snap to next page");
-                        if(currentPage < (getChildCount() - 1)){
+                        if (currentPage < (getChildCount() - 1)) {
                             currentPage++;
                         }
                     }
@@ -163,7 +162,7 @@ public class SmoothPagedView  extends ViewGroup {
         final int xDiff = (int) Math.abs(x - mLastMotionX);
         boolean xMoved = xDiff > LauncherSettings.SLIDE_PAGE_DELTAX;
         Log.v(TAG, "determineScrollingStart xMoved = " + xMoved);
-        if(xMoved){
+        if (xMoved) {
             mTouchState = TOUCH_STATE_SCROLLING;
             pageBeginMoving();
         }
@@ -175,10 +174,10 @@ public class SmoothPagedView  extends ViewGroup {
         }
     }
 
-    protected void snapPage(int pageId){
+    protected void snapPage(int pageId) {
         Log.v(TAG, "snapPage pageId = " + pageId);
         setCurrentPage(pageId);
-        if(mPageIndicator != null){
+        if (mPageIndicator != null) {
             mPageIndicator.setActiveMarkerIndex(mCurrentPage);
         }
         scrollTo(LauncherSettings.SCREEN_WIDTH * mCurrentPage, 0);
@@ -186,15 +185,15 @@ public class SmoothPagedView  extends ViewGroup {
         mTouchState = TOUCH_STATE_REST;
     }
 
-    protected boolean canSnapPrev(){
-        if((getCurrentPage() - 1) >= 0){
+    protected boolean canSnapPrev() {
+        if ((getCurrentPage() - 1) >= 0) {
             return true;
         }
         return false;
     }
 
-    protected boolean canSnapNext(){
-        if((getCurrentPage() + 1) < getChildCount()){
+    protected boolean canSnapNext() {
+        if ((getCurrentPage() + 1) < getChildCount()) {
             return true;
         }
         return false;

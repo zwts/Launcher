@@ -21,7 +21,6 @@ import com.tanshizw.launcher.items.BubbleTextView;
 import com.tanshizw.launcher.items.IconCache;
 import com.tanshizw.launcher.items.ItemInfo;
 import com.tanshizw.launcher.items.ShortcutInfo;
-import com.tanshizw.launcher.utility.LauncherSettings;
 import com.tanshizw.launcher.utility.Utilities;
 
 import java.text.Collator;
@@ -35,6 +34,7 @@ import java.util.List;
  * Default launcher application
  */
 public class Launcher extends Activity implements View.OnClickListener {
+    private final String TAG = "Launcher";
     private IconCache mIconCache;
     private AllAppsList mAllAppsList;
     private LauncherAppsCompat mLauncherApps;
@@ -45,12 +45,11 @@ public class Launcher extends Activity implements View.OnClickListener {
     DragLayer mDragLayer;
     Workspace mWorkspace;
     Hotseat mHotseat;
-    ArrayList<ItemInfo> workspaceItems = new ArrayList<ItemInfo>();
-    ArrayList<Long> orderedScreenIds = new ArrayList<Long>();
+    ArrayList<ItemInfo> workspaceItems = new ArrayList<>();
+    ArrayList<Long> orderedScreenIds = new ArrayList<>();
     private LayoutInflater mInflater;
     static final int ITEM_TYPE_APPLICATION = 0;
     static final int ITEM_TYPE_SHORTCUT = 1;
-    private final String TAG = "Launcher";
 
     @Override
     protected void onCreate(Bundle saveInstanceState) {
@@ -76,7 +75,7 @@ public class Launcher extends Activity implements View.OnClickListener {
     }
 
     private void bindWorkspaceScreens() {
-        Long screenId = Long.valueOf(0);
+        Long screenId = 0L;
         orderedScreenIds.add(screenId);
         orderedScreenIds.add(screenId + 1);
         bindAddScreens(orderedScreenIds);
@@ -89,7 +88,7 @@ public class Launcher extends Activity implements View.OnClickListener {
     private void setupAllAppItems() {
         mIconCache = new IconCache(this);
         mLabelCache = new HashMap<Object, CharSequence>();
-        mAllAppsList = new AllAppsList(mIconCache);
+        mAllAppsList = new AllAppsList();
 
         fillAllAppsList();
         applyAllApps();
@@ -123,41 +122,41 @@ public class Launcher extends Activity implements View.OnClickListener {
             AppInfo info = mAllAppsList.get(i);
             if (isHotseatApp(info)) {
                 applyHotseatApps(info, hotseatAppNum);
-                hotseatAppNum ++;
+                hotseatAppNum++;
             } else {
                 applyDesktopApps(info, desktopAppNum);
-                desktopAppNum ++;
+                desktopAppNum++;
             }
         }
         bindWorkspaceItems(workspaceItems);
     }
 
     private void applyHotseatApps(AppInfo info, int i) {
-            ShortcutInfo shortcut = new ShortcutInfo(info);
+        ShortcutInfo shortcut = new ShortcutInfo(info);
 
-            shortcut.container = LauncherSettings.CONTAINER_HOTSEAT;
-            shortcut.itemType = ITEM_TYPE_SHORTCUT;
-            shortcut.screenId = 0;
-            shortcut.id = 0;
-            shortcut.cellX = i;
-            shortcut.cellY = 0;
-            shortcut.spanX = 1;
-            shortcut.spanY = 1;
-            workspaceItems.add(shortcut);
+        shortcut.container = LauncherSettings.CONTAINER_HOTSEAT;
+        shortcut.itemType = ITEM_TYPE_SHORTCUT;
+        shortcut.screenId = 0;
+        shortcut.id = 0;
+        shortcut.cellX = i;
+        shortcut.cellY = 0;
+        shortcut.spanX = 1;
+        shortcut.spanY = 1;
+        workspaceItems.add(shortcut);
     }
 
     private void applyDesktopApps(AppInfo info, int i) {
-            ShortcutInfo shortcut = new ShortcutInfo(info);
+        ShortcutInfo shortcut = new ShortcutInfo(info);
 
-            shortcut.container = LauncherSettings.CONTAINER_DESKTOP;
-            shortcut.itemType = ITEM_TYPE_SHORTCUT;
-            shortcut.screenId = 1;
-            shortcut.id = 0;
-            shortcut.cellX = i % LauncherSettings.mCountX;
-            shortcut.cellY = i / LauncherSettings.mCountX;
-            shortcut.spanX = 1;
-            shortcut.spanY = 1;
-            workspaceItems.add(shortcut);
+        shortcut.container = LauncherSettings.CONTAINER_DESKTOP;
+        shortcut.itemType = ITEM_TYPE_SHORTCUT;
+        shortcut.screenId = 1;
+        shortcut.id = 0;
+        shortcut.cellX = i % LauncherSettings.mCountX;
+        shortcut.cellY = i / LauncherSettings.mCountX;
+        shortcut.spanX = 1;
+        shortcut.spanY = 1;
+        workspaceItems.add(shortcut);
     }
 
     private boolean isHotseatApp(AppInfo info) {

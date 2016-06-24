@@ -28,6 +28,10 @@ public class ShortcutInfo extends ItemInfo {
         return mIcon;
     }
 
+    public Bitmap getIcon() {
+        return mIcon;
+    }
+
     public void updateIcon(IconCache iconCache) {
         mIcon = iconCache.getIcon(intent);
     }

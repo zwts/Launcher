@@ -21,6 +21,7 @@ import android.graphics.drawable.PaintDrawable;
 import android.util.DisplayMetrics;
 
 
+import com.tanshizw.launcher.LauncherSettings;
 import com.tanshizw.launcher.items.IconCache;
 import com.tanshizw.launcher.R;
 
@@ -40,13 +41,11 @@ public final class Utilities {
         sCanvas.setDrawFilter(new PaintFlagsDrawFilter(Paint.DITHER_FLAG,
                 Paint.FILTER_BITMAP_FLAG));
     }
-    static int sColors[] = { 0xffff0000, 0xff00ff00, 0xff0000ff };
+
+    static int sColors[] = {0xffff0000, 0xff00ff00, 0xff0000ff};
     static int sColorIndex = 0;
 
-    static int[] sLoc0 = new int[2];
-    static int[] sLoc1 = new int[2];
-
-    public static void setupScreenSizeSettings(Activity launcher){
+    public static void setupScreenSizeSettings(Activity launcher) {
         DisplayMetrics dm = new DisplayMetrics();
         launcher.getWindowManager().getDefaultDisplay().getMetrics(dm);
         LauncherSettings.SCREEN_WIDTH = dm.widthPixels;
@@ -151,8 +150,8 @@ public final class Utilities {
             final Canvas canvas = sCanvas;
             canvas.setBitmap(bitmap);
 
-            final int left = (textureWidth-width) / 2;
-            final int top = (textureHeight-height) / 2;
+            final int left = (textureWidth - width) / 2;
+            final int top = (textureHeight - height) / 2;
 
             @SuppressWarnings("all") // suppress dead code warning
             final boolean debug = false;
@@ -162,11 +161,11 @@ public final class Utilities {
                 if (++sColorIndex >= sColors.length) sColorIndex = 0;
                 Paint debugPaint = new Paint();
                 debugPaint.setColor(0xffcccc00);
-                canvas.drawRect(left, top, left+width, top+height, debugPaint);
+                canvas.drawRect(left, top, left + width, top + height, debugPaint);
             }
 
             sOldBounds.set(icon.getBounds());
-            icon.setBounds(left, top, left+width, top+height);
+            icon.setBounds(left, top, left + width, top + height);
             icon.draw(canvas);
             icon.setBounds(sOldBounds);
             canvas.setBitmap(null);
