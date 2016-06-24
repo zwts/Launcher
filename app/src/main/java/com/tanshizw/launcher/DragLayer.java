@@ -6,13 +6,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.tanshizw.launcher.utility.LauncherSettings;
 import com.tanshizw.launcher.view.PageIndicator;
 
 /**
  * A ViewGroup that coordinates dragging across its descendants
  */
-public class DragLayer extends FrameLayout{
+public class DragLayer extends FrameLayout {
 
     private static final String TAG = "DragLayer";
 
@@ -38,7 +37,7 @@ public class DragLayer extends FrameLayout{
                 int y = t + LauncherSettings.WORKSPACE_HEIGHT + LauncherSettings.WORKSPACE_TOPPADDING;
                 child.layout(x, y, x + r, y + LauncherSettings.PAGEINDICATOR_HEIGHT);
             }
-            if(child instanceof Hotseat){
+            if (child instanceof Hotseat) {
                 Log.v(TAG, "onLayout Hotseat");
                 int x = l;
                 int y = t + LauncherSettings.WORKSPACE_HEIGHT + LauncherSettings.WORKSPACE_TOPPADDING

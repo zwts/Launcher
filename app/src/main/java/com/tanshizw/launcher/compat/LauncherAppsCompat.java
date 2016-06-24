@@ -55,7 +55,7 @@ public class LauncherAppsCompat {
         return null;
     }
 
-    public void startActivityForProfile(ComponentName component,Rect sourceBounds, Bundle opts) {
+    public void startActivityForProfile(ComponentName component, Rect sourceBounds, Bundle opts) {
         Intent launchIntent = new Intent(Intent.ACTION_MAIN);
         launchIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         launchIntent.setComponent(component);

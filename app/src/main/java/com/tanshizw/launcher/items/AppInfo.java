@@ -26,7 +26,7 @@ public class AppInfo extends ItemInfo {
     ComponentName componentName;
 
     /**
-     *  Used in setupWorkspaceItems, the resource of application items
+     * Used in setupWorkspaceItems, the resource of application items
      */
     public AppInfo(Context context, LauncherActivityInfoCompat info,
                    IconCache iconCache, HashMap<Object, CharSequence> labelCache) {

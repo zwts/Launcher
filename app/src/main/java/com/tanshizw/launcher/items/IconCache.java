@@ -25,6 +25,7 @@ public class IconCache {
         public CharSequence title;
         public CharSequence contentDescription;
     }
+
     private static class CacheKey {
         public ComponentName componentName;
 
@@ -43,6 +44,7 @@ public class IconCache {
             return other.componentName.equals(componentName);
         }
     }
+
     private static final int INITIAL_ICON_CACHE_CAPACITY = 50;
     private final HashMap<CacheKey, CacheEntry> mCache =
             new HashMap<CacheKey, CacheEntry>(INITIAL_ICON_CACHE_CAPACITY);
