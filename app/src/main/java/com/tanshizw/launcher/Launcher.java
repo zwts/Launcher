@@ -56,7 +56,8 @@ public class Launcher extends Activity implements View.OnClickListener {
 
     public static int mScreenW;
     public static  int mScreenH;
-    private HashSet<Integer> locationMarker = new HashSet<Integer>();
+    private HashSet<Integer> mWorkspaceMarker = new HashSet<Integer>();
+    private HashSet<Integer> mHotsetMarker = new HashSet<Integer>();
 
     @Override
     protected void onCreate(Bundle saveInstanceState) {
@@ -147,10 +148,12 @@ public class Launcher extends Activity implements View.OnClickListener {
             shortcut.screenId = 0;
             shortcut.id = 0;
             shortcut.cellX = i;
+            shortcut.initCellX = shortcut.cellX;
             shortcut.cellY = 0;
             shortcut.spanX = 1;
             shortcut.spanY = 1;
             workspaceItems.add(shortcut);
+            mHotsetMarker.add(i);
     }
 
     private void applyDesktopApps(AppInfo info, int i) {
@@ -169,7 +172,7 @@ public class Launcher extends Activity implements View.OnClickListener {
             shortcut.spanY = 1;
 
             workspaceItems.add(shortcut);
-            locationMarker.add((int)shortcut.screenId*100+shortcut.cellY*10+shortcut.cellX);
+            mWorkspaceMarker.add((int)shortcut.screenId*100+shortcut.cellY*10+shortcut.cellX);
 
     }
 
@@ -276,7 +279,7 @@ public class Launcher extends Activity implements View.OnClickListener {
             @Override
             public boolean onLongClick(View view) {
                 favorite.setVisibility(View.GONE);
-                DragView dragView = new DragView(Launcher.this,favorite,mDragLayer,workspaceItems.get(i),info.getIcon(),locationMarker,mWorkspace,i);
+                DragView dragView = new DragView(Launcher.this,favorite,mDragLayer,workspaceItems.get(i),info.getIcon(),mWorkspaceMarker,mHotsetMarker,mWorkspace,i);
                 dragView.show();
                 return true;
             }
