@@ -2,11 +2,16 @@ package com.tanshizw.launcher.items;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.widget.TextView;
 
+import com.tanshizw.launcher.Launcher;
+import com.tanshizw.launcher.R;
 import com.tanshizw.launcher.utility.FastBitmapDrawable;
 import com.tanshizw.launcher.utility.Utilities;
 
@@ -17,9 +22,22 @@ public class BubbleTextView extends TextView {
     private final String TAG = "BubbleTextView";
 
     private final int ICON_TEXT_PADING = 10;
+    private boolean mLayoutHorizontal;
+
+    public BubbleTextView(Context context) {
+        this(context, null, 0);
+    }
+
     public BubbleTextView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        Log.v(TAG, "BubbleTextView");
+        this(context, attrs, 0);
+    }
+
+    public BubbleTextView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+
+        TypedArray a = context.obtainStyledAttributes(attrs,
+                R.styleable.BubbleTextView, defStyle, 0);
+        mLayoutHorizontal = a.getBoolean(R.styleable.BubbleTextView_layoutHorizontal, false);
     }
 
     public void applyFromShortcutInfo(ShortcutInfo info, IconCache iconCache,
@@ -59,5 +77,9 @@ public class BubbleTextView extends TextView {
         }
     }
 
+    /** Returns whether the layout is horizontal. */
+    public boolean isLayoutHorizontal() {
+        return mLayoutHorizontal;
+    }
 
 }

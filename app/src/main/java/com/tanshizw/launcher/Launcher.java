@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.tanshizw.launcher.compat.LauncherActivityInfoCompat;
 import com.tanshizw.launcher.compat.LauncherAppsCompat;
+import com.tanshizw.launcher.drag.DragController;
 import com.tanshizw.launcher.items.AllAppsList;
 import com.tanshizw.launcher.items.AppInfo;
 import com.tanshizw.launcher.items.BubbleTextView;
@@ -33,7 +34,7 @@ import java.util.List;
 /**
  * Default launcher application
  */
-public class Launcher extends Activity implements View.OnClickListener {
+public class Launcher extends Activity implements View.OnClickListener, View.OnLongClickListener {
     private final String TAG = "Launcher";
     private IconCache mIconCache;
     private AllAppsList mAllAppsList;
@@ -51,6 +52,8 @@ public class Launcher extends Activity implements View.OnClickListener {
     static final int ITEM_TYPE_APPLICATION = 0;
     static final int ITEM_TYPE_SHORTCUT = 1;
 
+    private DragController mDragController;
+
     @Override
     protected void onCreate(Bundle saveInstanceState) {
         super.onCreate(saveInstanceState);
@@ -62,16 +65,30 @@ public class Launcher extends Activity implements View.OnClickListener {
         mContext = getApplicationContext();
         mInflater = getLayoutInflater();
         mLauncherApps = LauncherAppsCompat.getInstance(this);
-        mDragLayer = (DragLayer) findViewById(R.id.drag_layer);
-        mWorkspace = (Workspace) mDragLayer.findViewById(R.id.workspace);
-        mHotseat = (Hotseat) mDragLayer.findViewById(R.id.hot_seat);
-        mIsSafeModeEnabled = getPackageManager().isSafeMode();
+        mDragController = new DragController(this);
 
+        mIsSafeModeEnabled = getPackageManager().isSafeMode();
+        setupViews();
         Utilities.setupScreenSizeSettings(this);
         bindWorkspaceScreens();
         bindHotseatLayout();
 
         setupAllAppItems();
+    }
+
+    private void  setupViews() {
+        final DragController dragController = mDragController;
+        mDragLayer = (DragLayer) findViewById(R.id.drag_layer);
+        mWorkspace = (Workspace) mDragLayer.findViewById(R.id.workspace);
+        mHotseat = (Hotseat) mDragLayer.findViewById(R.id.hot_seat);
+
+        // Setup the drag layer
+        mDragLayer.setup(this, dragController);
+
+        // Setup the workspace
+        mWorkspace.setOnLongClickListener(this);
+        mWorkspace.setup(dragController);
+        dragController.addDragListener(mWorkspace);
     }
 
     private void bindWorkspaceScreens() {
@@ -398,7 +415,34 @@ public class Launcher extends Activity implements View.OnClickListener {
         return false;
     }
 
+    @Override
+    public boolean onLongClick(View v) {
+        //Long click on workspace blank space
+        if (v instanceof Workspace) {
+           //TODO: Over view mode
+           return false;
+        }
+
+        //Long click on items in workspace
+        CellLayout.CellInfo longClickCellInfo = null;
+        View itemUnderLongClick = null;
+        if (v.getTag() instanceof ItemInfo) {
+            ItemInfo info = (ItemInfo) v.getTag();
+            longClickCellInfo = new CellLayout.CellInfo(v, info);
+            itemUnderLongClick = longClickCellInfo.cell;
+        }
+
+        if (!mDragController.isDragging()) {
+            mWorkspace.startDrag(longClickCellInfo);
+        }
+        return true;
+    }
+
     public Hotseat getHotseat() {
         return mHotseat;
+    }
+
+    public DragLayer getDragLayer() {
+        return  mDragLayer;
     }
 }

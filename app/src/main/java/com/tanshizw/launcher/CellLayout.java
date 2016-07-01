@@ -107,6 +107,16 @@ public class CellLayout extends ViewGroup {
         }
     }
 
+    public void prepareChildForDrag(View child) {
+        markCellsAsUnoccupiedForView(child);
+    }
+
+    public void markCellsAsUnoccupiedForView(View view) {
+        if (view == null || view.getParent() != mShortcutsAndWidgets) return;
+        LayoutParams lp = (LayoutParams) view.getLayoutParams();
+        markCellsForView(lp.cellX, lp.cellY, lp.cellHSpan, lp.cellVSpan, mOccupied, false);
+    }
+
     public static class LayoutParams extends ViewGroup.MarginLayoutParams {
         /**
          * Horizontal location of the item in the grid.
@@ -151,6 +161,32 @@ public class CellLayout extends ViewGroup {
             height = myCellVSpan * cellHeight;
             x = myCellX * (cellWidth + widthGap) + leftMargin;
             y = myCellY * (cellHeight + heightGap) + topMargin;
+        }
+    }
+
+    // This class stores info for two purposes:
+    // 1. When dragging items (mDragInfo in Workspace), we store the View, its cellX & cellY,
+    //    its spanX, spanY, and the screen it is on
+    // 2. When long clicking on an empty cell in a CellLayout, we save information about the
+    //    cellX and cellY coordinates and which page was clicked. We then set this as a tag on
+    //    the CellLayout that was long clicked
+    public static final class CellInfo {
+        View cell;
+        int cellX = -1;
+        int cellY = -1;
+        int spanX;
+        int spanY;
+        long screenId;
+        long container;
+
+        public CellInfo(View v, ItemInfo info) {
+            cell = v;
+            cellX = info.cellX;
+            cellY = info.cellY;
+            spanX = info.spanX;
+            spanY = info.spanY;
+            screenId = info.screenId;
+            container = info.container;
         }
     }
 }
