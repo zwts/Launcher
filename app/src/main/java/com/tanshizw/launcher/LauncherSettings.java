@@ -21,11 +21,11 @@ final public class LauncherSettings {
     //hotseat height
     public static final int HOTSEAT_HEIGHT = 100;
     //icon width
-    public static final int ICON_WIDTH = 130;
+    public static final int CELL_WIDTH = 130;
     //icon height
-    public static final int ICON_HEIGHT = 160;
+    public static final int CELL_HEIGHT = 160;
     //icon padding
-    public static final int ICON_PADDING = 0;
+    public static final int CELL_PADDING = 0;
     //mCountX cells in horizontal
     public static final int mCountX = 6;
     //mCountY cells in vertical

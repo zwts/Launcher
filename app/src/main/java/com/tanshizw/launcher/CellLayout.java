@@ -23,12 +23,15 @@ public class CellLayout extends ViewGroup {
     private int mCountY;
     boolean[][] mOccupied;
     private ShortcutAndWidgetContainer mShortcutsAndWidgets;
-    private int mCellWidth;
-    private int mCellHeight;
+    private int mCellWidth = LauncherSettings.CELL_WIDTH;
+    private int mCellHeight = LauncherSettings.CELL_HEIGHT;
     private int mWidthGap;
     private int mHeightGap;
     public static final int MODE_ON_DROP = 2;
     final int[] mTmpPoint = new int[2];
+    private int[] mDirectionVector = new int[2];
+    int[] mPreviousReorderDirection = new int[2];
+    private static final int INVALID_DIRECTION = -100;
 
     public CellLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -370,4 +373,108 @@ public class CellLayout extends ViewGroup {
         }
     }
 
+    int[] performReorder(int pixelX, int pixelY, int minSpanX, int minSpanY, int spanX, int spanY,
+                         View dragView, int[] result, int resultSpan[], int mode) {
+/*      TODO:This is find the solution of noShuffleSolution, involving pushing / displacing
+        // First we determine if things have moved enough to cause a different layout
+        result = findNearestArea(pixelX, pixelY, spanX, spanY, result);
+
+        if (resultSpan == null) {
+            resultSpan = new int[2];
+        }
+
+        // When we are checking drop validity or actually dropping, we don't recompute the
+        // direction vector, since we want the solution to match the preview, and it's possible
+        // that the exact position of the item has changed to result in a new reordering outcome.
+        if ((mode == MODE_ON_DROP || mode == MODE_ON_DROP_EXTERNAL || mode == MODE_ACCEPT_DROP)
+                && mPreviousReorderDirection[0] != INVALID_DIRECTION) {
+            mDirectionVector[0] = mPreviousReorderDirection[0];
+            mDirectionVector[1] = mPreviousReorderDirection[1];
+            // We reset this vector after drop
+            if (mode == MODE_ON_DROP || mode == MODE_ON_DROP_EXTERNAL) {
+                mPreviousReorderDirection[0] = INVALID_DIRECTION;
+                mPreviousReorderDirection[1] = INVALID_DIRECTION;
+            }
+        } else {
+            getDirectionVectorForDrop(pixelX, pixelY, spanX, spanY, dragView, mDirectionVector);
+            mPreviousReorderDirection[0] = mDirectionVector[0];
+            mPreviousReorderDirection[1] = mDirectionVector[1];
+        }
+
+        // Find a solution involving pushing / displacing any items in the way
+        ItemConfiguration swapSolution = findReorderSolution(pixelX, pixelY, minSpanX, minSpanY,
+                spanX,  spanY, mDirectionVector, dragView,  true,  new ItemConfiguration());
+
+        // We attempt the approach which doesn't shuffle views at all
+        ItemConfiguration noShuffleSolution = findConfigurationNoShuffle(pixelX, pixelY, minSpanX,
+                minSpanY, spanX, spanY, dragView, new ItemConfiguration());
+
+        ItemConfiguration finalSolution = null;
+
+        // If the reorder solution requires resizing (shrinking) the item being dropped, we instead
+        // favor a solution in which the item is not resized, but
+        if (swapSolution.isSolution && swapSolution.area() >= noShuffleSolution.area()) {
+            finalSolution = swapSolution;
+        } else if (noShuffleSolution.isSolution) {
+            finalSolution = noShuffleSolution;
+        }
+
+        if (mode == MODE_SHOW_REORDER_HINT) {
+            if (finalSolution != null) {
+                beginOrAdjustReorderPreviewAnimations(finalSolution, dragView, 0,
+                        ReorderPreviewAnimation.MODE_HINT);
+                result[0] = finalSolution.dragViewX;
+                result[1] = finalSolution.dragViewY;
+                resultSpan[0] = finalSolution.dragViewSpanX;
+                resultSpan[1] = finalSolution.dragViewSpanY;
+            } else {
+                result[0] = result[1] = resultSpan[0] = resultSpan[1] = -1;
+            }
+            return result;
+        }
+
+        boolean foundSolution = true;
+        if (!DESTRUCTIVE_REORDER) {
+            setUseTempCoords(true);
+        }
+
+        if (finalSolution != null) {
+            result[0] = finalSolution.dragViewX;
+            result[1] = finalSolution.dragViewY;
+            resultSpan[0] = finalSolution.dragViewSpanX;
+            resultSpan[1] = finalSolution.dragViewSpanY;
+
+            // If we're just testing for a possible location (MODE_ACCEPT_DROP), we don't bother
+            // committing anything or animating anything as we just want to determine if a solution
+            // exists
+            if (mode == MODE_DRAG_OVER || mode == MODE_ON_DROP || mode == MODE_ON_DROP_EXTERNAL) {
+                if (!DESTRUCTIVE_REORDER) {
+                    copySolutionToTempState(finalSolution, dragView);
+                }
+                setItemPlacementDirty(true);
+                animateItemsToSolution(finalSolution, dragView, mode == MODE_ON_DROP);
+
+                if (!DESTRUCTIVE_REORDER &&
+                        (mode == MODE_ON_DROP || mode == MODE_ON_DROP_EXTERNAL)) {
+                    commitTempPlacement();
+                    completeAndClearReorderPreviewAnimations();
+                    setItemPlacementDirty(false);
+                } else {
+                    beginOrAdjustReorderPreviewAnimations(finalSolution, dragView,
+                            REORDER_ANIMATION_DURATION,  ReorderPreviewAnimation.MODE_PREVIEW);
+                }
+            }
+        } else {
+            foundSolution = false;
+            result[0] = result[1] = resultSpan[0] = resultSpan[1] = -1;
+        }
+
+        if ((mode == MODE_ON_DROP || !foundSolution) && !DESTRUCTIVE_REORDER) {
+            setUseTempCoords(false);
+        }
+
+        mShortcutsAndWidgets.requestLayout();
+        return result;*/
+        return result;
+    }
 }

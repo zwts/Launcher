@@ -134,8 +134,8 @@ public class Workspace extends SmoothPagedView implements Insettable, DragSource
         if (genericLp == null || !(genericLp instanceof CellLayout.LayoutParams)) {
             Log.v(TAG, "Layout is not CellLayout.LayoutParams");
             lp = new CellLayout.LayoutParams(x, y, spanX, spanY);
-            lp.setup(LauncherSettings.ICON_WIDTH, LauncherSettings.ICON_HEIGHT,
-                    LauncherSettings.ICON_PADDING, LauncherSettings.ICON_PADDING);
+            lp.setup(LauncherSettings.CELL_WIDTH, LauncherSettings.CELL_HEIGHT,
+                    LauncherSettings.CELL_PADDING, LauncherSettings.CELL_PADDING);
         } else {
             Log.v(TAG, "Layout is CellLayout.LayoutParams");
             lp = (CellLayout.LayoutParams) genericLp;
@@ -476,6 +476,11 @@ public class Workspace extends SmoothPagedView implements Insettable, DragSource
                 int minSpanX = item.spanX;
                 int minSpanY = item.spanY;
                 int[] resultSpan = new int[2];
+                //This for s
+                mTargetCell = dropTargetLayout.performReorder((int) mDragViewVisualCenter[0],
+                        (int) mDragViewVisualCenter[1], minSpanX, minSpanY, spanX, spanY, cell,
+                        mTargetCell, resultSpan, CellLayout.MODE_ON_DROP);
+
                 boolean foundCell = mTargetCell[0] >= 0 && mTargetCell[1] >= 0;
 
                 if (foundCell) {
@@ -490,12 +495,14 @@ public class Workspace extends SmoothPagedView implements Insettable, DragSource
                                 info.spanX, info.spanY);
                     }
 
-                    // update the item's position after drop
+                    // update the item's position after drop, IMPORTANT DO SET ITEMS POSITION
                     CellLayout.LayoutParams lp = (CellLayout.LayoutParams) cell.getLayoutParams();
                     lp.cellX = mTargetCell[0];
                     lp.cellY = mTargetCell[1];
                     lp.cellHSpan = item.spanX;
                     lp.cellVSpan = item.spanY;
+                    lp.setup(LauncherSettings.CELL_WIDTH, LauncherSettings.CELL_HEIGHT,
+                            LauncherSettings.CELL_PADDING, LauncherSettings.CELL_PADDING);
                 } else {
                     // If we can't find a drop location, we return the item to its original position
                     CellLayout.LayoutParams lp = (CellLayout.LayoutParams) cell.getLayoutParams();

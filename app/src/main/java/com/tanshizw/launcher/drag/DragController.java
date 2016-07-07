@@ -229,16 +229,16 @@ public class DragController {
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 // Remember where the motion event started
-/*                mMotionDownX = dragLayerX;
+                mMotionDownX = dragLayerX;
                 mMotionDownY = dragLayerY;
 
-                if ((dragLayerX < mScrollZone) || (dragLayerX > mScrollView.getWidth() - mScrollZone)) {
+/*                if ((dragLayerX < mScrollZone) || (dragLayerX > mScrollView.getWidth() - mScrollZone)) {
                     mScrollState = SCROLL_WAITING_IN_ZONE;
                     mHandler.postDelayed(mScrollRunnable, SCROLL_DELAY);
                 } else {
                     mScrollState = SCROLL_OUTSIDE_ZONE;
-                }
-                handleMoveEvent(dragLayerX, dragLayerY);*/
+                }*/
+                handleMoveEvent(dragLayerX, dragLayerY);
                 break;
             case MotionEvent.ACTION_MOVE:
                 handleMoveEvent(dragLayerX, dragLayerY);

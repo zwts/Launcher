@@ -168,10 +168,10 @@ public class Launcher extends Activity implements View.OnClickListener, View.OnL
 
         shortcut.container = LauncherSettings.CONTAINER_DESKTOP;
         shortcut.itemType = ITEM_TYPE_SHORTCUT;
-        shortcut.screenId = 1;
+        shortcut.screenId = 0;
         shortcut.id = 0;
         shortcut.cellX = i % LauncherSettings.mCountX;
-        shortcut.cellY = i / LauncherSettings.mCountX;
+        shortcut.cellY = i / LauncherSettings.mCountX + 1;
         shortcut.spanX = 1;
         shortcut.spanY = 1;
         workspaceItems.add(shortcut);
