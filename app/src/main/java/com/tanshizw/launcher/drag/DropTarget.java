@@ -56,7 +56,7 @@ public interface DropTarget {
          * the visual center represents the user's interpretation of where the item is, and hence
          * is the appropriate point to use when determining drop location.
          */
-/*        public final float[] getVisualCenter(float[] recycle) {
+        public final float[] getVisualCenter(float[] recycle) {
             final float res[] = (recycle == null) ? new float[2] : recycle;
 
             // These represent the visual top and left of drag view if a dragRect was provided.
@@ -71,7 +71,7 @@ public interface DropTarget {
             res[1] = top + dragView.getDragRegion().height() / 2;
 
             return res;
-        }*/
+        }
     }
 
     /**

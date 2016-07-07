@@ -30,6 +30,7 @@ public class DragView extends View {
     ValueAnimator mAnim;
     private float mOffsetX = 0.0f;
     private float mOffsetY = 0.0f;
+    private boolean mHasDrawn = false;
     // The intrinsic icon scale factor is the scale factor for a drag icon over the workspace
     // size.  This is ignored for non-icons.
     private float mIntrinsicIconScale = 1f;
@@ -106,10 +107,6 @@ public class DragView extends View {
         return anim;
     }
 
-    public void setDragRegion(Rect r) {
-        mDragRegion = r;
-    }
-
     public void setDragVisualizeOffset(Point p) {
         mDragVisualizeOffset = p;
     }
@@ -117,7 +114,6 @@ public class DragView extends View {
     /**
      * Create a window containing this view and show it.
      *
-     * @param windowToken obtained from v.getWindowToken() from one of your views
      * @param touchX the x coordinate the user touched in DragLayer coordinates
      * @param touchY the y coordinate the user touched in DragLayer coordinates
      */
@@ -145,8 +141,57 @@ public class DragView extends View {
         mIntrinsicIconScale = scale;
     }
 
+    public void cancelAnimation() {
+        if (mAnim != null && mAnim.isRunning()) {
+            mAnim.cancel();
+        }
+    }
+
+    public void resetLayoutParams() {
+        mOffsetX = mOffsetY = 0;
+        requestLayout();
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
+        mHasDrawn = true;
         canvas.drawBitmap(mBitmap, 0.0f, 0.0f, mPaint);
+    }
+
+    /**
+     * Move the window containing this view.
+     *
+     * @param touchX the x coordinate the user touched in DragLayer coordinates
+     * @param touchY the y coordinate the user touched in DragLayer coordinates
+     */
+    void move(int touchX, int touchY) {
+        setTranslationX(touchX - mRegistrationX + (int) mOffsetX);
+        setTranslationY(touchY - mRegistrationY + (int) mOffsetY);
+    }
+
+    void remove() {
+        if (getParent() != null) {
+            mDragLayer.removeView(DragView.this);
+        }
+    }
+
+    public void setDragRegion(Rect r) {
+        mDragRegion = r;
+    }
+
+    public Rect getDragRegion() {
+        return mDragRegion;
+    }
+
+    public boolean hasDrawn() {
+        return mHasDrawn;
+    }
+
+    public Point getDragVisualizeOffset() {
+        return mDragVisualizeOffset;
+    }
+
+    public float getIntrinsicIconScaleFactor() {
+        return mIntrinsicIconScale;
     }
 }

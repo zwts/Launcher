@@ -33,6 +33,8 @@ public class SmoothPagedView extends ViewGroup {
     protected float mLastMotionY;
 
     protected boolean mIsPageMoving = false;
+    protected int mNextPage = INVALID_PAGE;
+    protected static final int INVALID_PAGE = -1;
 
     public SmoothPagedView(Context context, AttributeSet attrs) {
         super(context, attrs);

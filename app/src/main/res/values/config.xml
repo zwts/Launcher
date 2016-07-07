@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <bool name="allow_rotation">false</bool>
+    <!-- The distance at which the animation should take the max duration -->
+    <integer name="config_dropAnimMaxDist">800</integer>
+    <!-- Parameters controlling the animation for when an item is dropped on the home screen,
+     and it animates from its old position to the new one. -->
+    <integer name="config_dropAnimMinDuration">100</integer>
+    <integer name="config_dropAnimMaxDuration">500</integer>
 </resources>

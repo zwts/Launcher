@@ -89,6 +89,7 @@ public class Launcher extends Activity implements View.OnClickListener, View.OnL
         mWorkspace.setOnLongClickListener(this);
         mWorkspace.setup(dragController);
         dragController.addDragListener(mWorkspace);
+        dragController.addDropTarget(mWorkspace);
     }
 
     private void bindWorkspaceScreens() {

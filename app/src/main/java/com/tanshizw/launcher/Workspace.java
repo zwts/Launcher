@@ -3,7 +3,9 @@ package com.tanshizw.launcher;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.drawable.Drawable;
@@ -16,15 +18,18 @@ import android.widget.TextView;
 import com.tanshizw.launcher.drag.DragController;
 import com.tanshizw.launcher.drag.DragSource;
 import com.tanshizw.launcher.drag.DragView;
+import com.tanshizw.launcher.drag.DropTarget;
 import com.tanshizw.launcher.items.BubbleTextView;
+import com.tanshizw.launcher.items.ItemInfo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by user on 6/7/16.
  */
-public class Workspace extends SmoothPagedView implements Insettable, DragSource, DragController.DragListener{
+public class Workspace extends SmoothPagedView implements Insettable, DragSource,DropTarget, DragController.DragListener{
     private static final String TAG = "Launcher.Workspace";
     private HashMap<Long, CellLayout> mWorkspaceScreens = new HashMap<Long, CellLayout>();
     private Launcher mLauncher;
@@ -36,6 +41,20 @@ public class Workspace extends SmoothPagedView implements Insettable, DragSource
     private ShortcutAndWidgetContainer mDragSourceInternal;
     private DragController mDragController;
     protected OnLongClickListener mLongClickListener;
+    private float[] mDragViewVisualCenter = new float[2];
+    boolean mAnimatingViewIntoPlace = false;
+    /**
+     * The CellLayout that is currently being dragged over
+     */
+    private CellLayout mDragTargetLayout = null;
+    /**
+     * The CellLayout which will be dropped to
+     */
+    private CellLayout mDropToLayout = null;
+    /**
+     * Target drop area calculated during last acceptDrop call.
+     */
+    private int[] mTargetCell = new int[2];
 
     public Workspace(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -128,6 +147,10 @@ public class Workspace extends SmoothPagedView implements Insettable, DragSource
         
         if (!layout.addViewToCellLayout(child, 0, lp, true)) {
             Log.v(TAG, "add view to CellLayout failed");
+        }
+
+        if (child instanceof DropTarget) {
+            mDragController.addDropTarget((DropTarget) child);
         }
 
         child.setHapticFeedbackEnabled(false);
@@ -298,6 +321,60 @@ public class Workspace extends SmoothPagedView implements Insettable, DragSource
         return bounds;
     }
 
+    /*
+     *
+     * Convert the 2D coordinate xy from the parent View's coordinate space to this CellLayout's
+     * coordinate space. The argument xy is modified with the return result.
+     *
+     * if cachedInverseMatrix is not null, this method will just use that matrix instead of
+     * computing it itself; we use this to avoid redundant matrix inversions in
+     * findMatchingPageForDragOver
+     *
+     */
+    void mapPointFromSelfToChild(View v, float[] xy, Matrix cachedInverseMatrix) {
+        xy[0] = xy[0] - v.getLeft();
+        xy[1] = xy[1] - v.getTop();
+    }
+
+    /**
+     * Calculate the nearest cell where the given object would be dropped.
+     *
+     * pixelX and pixelY should be in the coordinate system of layout
+     */
+    private int[] findNearestArea(int pixelX, int pixelY,
+                                 int spanX, int spanY, CellLayout layout, int[] recycle) {
+        return layout.findNearestArea(
+                pixelX, pixelY, spanX, spanY, recycle);
+    }
+
+    /**
+     * Returns a specific CellLayout
+     */
+    CellLayout getParentCellLayoutForView(View v) {
+        ArrayList<CellLayout> layouts = getWorkspaceAndHotseatCellLayouts();
+        for (CellLayout layout : layouts) {
+            if (layout.getShortcutsAndWidgets().indexOfChild(v) > -1) {
+                return layout;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns a list of all the CellLayouts in the workspace.
+     */
+    ArrayList<CellLayout> getWorkspaceAndHotseatCellLayouts() {
+        ArrayList<CellLayout> layouts = new ArrayList<CellLayout>();
+        int screenCount = getChildCount();
+        for (int screen = 0; screen < screenCount; screen++) {
+            layouts.add(((CellLayout) getChildAt(screen)));
+        }
+        if (mLauncher.getHotseat() != null) {
+            layouts.add(mLauncher.getHotseat().getLayout());
+        }
+        return layouts;
+    }
+
     /**
      * Registers the specified listener on each page contained in this workspace.
      *
@@ -338,6 +415,11 @@ public class Workspace extends SmoothPagedView implements Insettable, DragSource
 
     }
 
+    @Override
+    public void onDropCompleted(View target, DragObject d, boolean isFlingToDelete, boolean success) {
+
+    }
+
     // DragController.DragListener
     @Override
     public void onDragStart(DragSource source, Object info, int dragAction) {
@@ -346,6 +428,215 @@ public class Workspace extends SmoothPagedView implements Insettable, DragSource
 
     @Override
     public void onDragEnd() {
+
+    }
+
+    //DropTarget
+    @Override
+    public boolean isDropEnabled() {
+        return true;
+    }
+
+    @Override
+    public void onDrop(DragObject d) {
+        mDragViewVisualCenter = d.getVisualCenter(mDragViewVisualCenter);
+        CellLayout dropTargetLayout = mDropToLayout;
+
+        // We want the point to be mapped to the dragTarget.
+        if (dropTargetLayout != null) {
+            //TODO：HOTSEAT mapPointFromSelfToHotseatLayout(mLauncher.getHotseat(), mDragViewVisualCenter);
+            mapPointFromSelfToChild(dropTargetLayout, mDragViewVisualCenter, null);
+        }
+
+        if (d.dragSource != this) {
+            //TODO: onDropExternal
+        } else if (mDragInfo != null) {
+            final View cell =  mDragInfo.cell;
+            if (dropTargetLayout != null && !d.cancelled) {
+                boolean hasMovedLayouts = (getParentCellLayoutForView(cell) != dropTargetLayout);
+                long container = LauncherSettings.CONTAINER_DESKTOP;
+                long screenId = mDragInfo.screenId;
+                int spanX = mDragInfo != null ? mDragInfo.spanX : 1;
+                int spanY = mDragInfo != null ? mDragInfo.spanY : 1;
+
+                // First we find the cell nearest to point at which the item is
+                // dropped, without any consideration to whether there is an item there.
+                mTargetCell = findNearestArea((int) mDragViewVisualCenter[0], (int)
+                        mDragViewVisualCenter[1], spanX, spanY, dropTargetLayout, mTargetCell);
+                float distance = dropTargetLayout.getDistanceFromCell(mDragViewVisualCenter[0],
+                        mDragViewVisualCenter[1], mTargetCell);
+
+                // If the item being dropped is a shortcut and the nearest drop
+                // cell also contains a shortcut, then create a folder with the two shortcuts.
+                //TODO create folder if a shortcut to a shortcut
+
+                // Aside from the special case where we're dropping a shortcut onto a shortcut,
+                // we need to find the nearest cell location that is vacant
+                ItemInfo item = (ItemInfo) d.dragInfo;
+                int minSpanX = item.spanX;
+                int minSpanY = item.spanY;
+                int[] resultSpan = new int[2];
+                boolean foundCell = mTargetCell[0] >= 0 && mTargetCell[1] >= 0;
+
+                if (foundCell) {
+                    final ItemInfo info = (ItemInfo) cell.getTag();
+                    if (hasMovedLayouts) {
+                        // Reparent the view
+                        CellLayout parentCell = getParentCellLayoutForView(cell);
+                        if (parentCell != null) {
+                            parentCell.removeView(cell);
+                        }
+                        addInScreenFromBind(cell, container, screenId, mTargetCell[0], mTargetCell[1],
+                                info.spanX, info.spanY);
+                    }
+
+                    // update the item's position after drop
+                    CellLayout.LayoutParams lp = (CellLayout.LayoutParams) cell.getLayoutParams();
+                    lp.cellX = mTargetCell[0];
+                    lp.cellY = mTargetCell[1];
+                    lp.cellHSpan = item.spanX;
+                    lp.cellVSpan = item.spanY;
+                } else {
+                    // If we can't find a drop location, we return the item to its original position
+                    CellLayout.LayoutParams lp = (CellLayout.LayoutParams) cell.getLayoutParams();
+                    mTargetCell[0] = lp.cellX;
+                    mTargetCell[1] = lp.cellY;
+                    CellLayout layout = (CellLayout) cell.getParent().getParent();
+                    layout.markCellsAsOccupiedForView(cell);
+                }
+
+                final CellLayout parent = (CellLayout) cell.getParent().getParent();
+                final Runnable onCompleteRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        mAnimatingViewIntoPlace = false;
+                    }
+                };
+                mAnimatingViewIntoPlace = true;
+
+                if (d.dragView.hasDrawn()) {
+                    final ItemInfo info = (ItemInfo) cell.getTag();
+                    int duration = -1; // current screen
+                    mLauncher.getDragLayer().animateViewIntoPosition(d.dragView, cell, duration,
+                            onCompleteRunnable, this);
+                } else {
+                    d.deferDragViewCleanupPostAnimation = false;
+                    cell.setVisibility(VISIBLE);
+                }
+
+                parent.onDropChild(cell);
+            }
+        }
+    }
+
+    @Override
+    public void onDragEnter(DragObject dragObject) {
+        mDropToLayout = null;
+        CellLayout layout = getCurrentDropLayout();
+        setCurrentDropLayout(layout);
+    }
+
+    void setCurrentDropLayout(CellLayout layout) {
+/*        if (mDragTargetLayout != null) {
+            mDragTargetLayout.revertTempState();
+            mDragTargetLayout.onDragExit();
+        }*/
+        mDragTargetLayout = layout;
+/*        if (mDragTargetLayout != null) {
+            mDragTargetLayout.onDragEnter();
+        }
+        cleanupReorder(true);
+        cleanupFolderCreation();
+        setCurrentDropOverCell(-1, -1);*/
+    }
+
+    /**
+     * Return the current {@link CellLayout}, correctly picking the destination
+     * screen while a scroll is in progress.
+     */
+    public CellLayout getCurrentDropLayout() {
+        return (CellLayout) getChildAt(getNextPage());
+    }
+
+    /**
+     * Returns the index of page to be shown immediately afterwards.
+     */
+    int getNextPage() {
+        return (mNextPage != INVALID_PAGE) ? mNextPage : mCurrentPage;
+    }
+
+    @Override
+    public void onDragOver(DragObject dragObject) {
+
+    }
+
+    @Override
+    public void onDragExit(DragObject d) {
+/*        // Here we store the final page that will be dropped to, if the workspace in fact
+        // receives the drop
+        if (mInScrollArea) {
+            if (isPageMoving()) {
+                // If the user drops while the page is scrolling, we should use that page as the
+                // destination instead of the page that is being hovered over.
+                mDropToLayout = (CellLayout) getPageAt(getNextPage());
+            } else {
+                mDropToLayout = mDragOverlappingLayout;
+            }
+        } else {
+            mDropToLayout = mDragTargetLayout;
+        }
+
+        if (mDragMode == DRAG_MODE_CREATE_FOLDER) {
+            mCreateUserFolderOnDrop = true;
+        } else if (mDragMode == DRAG_MODE_ADD_TO_FOLDER) {
+            mAddToExistingFolderOnDrop = true;
+        }
+
+        // Reset the scroll area and previous drag target
+        onResetScrollArea();
+        setCurrentDropLayout(null);
+        setCurrentDragOverlappingLayout(null);
+
+        mSpringLoadedDragController.cancel();
+
+        mLauncher.getDragLayer().hidePageHints();*/
+        mDropToLayout = mDragTargetLayout;
+    }
+
+    @Override
+    public void onFlingToDelete(DragObject dragObject, PointF vec) {
+
+    }
+
+    @Override
+    public boolean acceptDrop(DragObject d) {
+        CellLayout dropTargetLayout = mDropToLayout;
+        // TODO:If it's an external drop (e.g. from All Apps), check if it should be accepted
+        if (d.dragSource != this) {
+
+        }
+/*        long screenId = getIdForScreen(dropTargetLayout);
+        if (screenId == EXTRA_EMPTY_SCREEN_ID) {
+            commitExtraEmptyScreen();
+        }*/
+
+        return true;
+    }
+
+    @Override
+    public void prepareAccessibilityDrop() {
+
+    }
+
+    @Override
+    public void getHitRectRelativeToDragLayer(Rect outRect) {
+        // We want the workspace to have the whole area of the display (it will find the correct
+        // cell layout to drop to in the existing drag/drop logic.
+        mLauncher.getDragLayer().getDescendantRectRelativeToSelf(this, outRect);
+    }
+
+    @Override
+    public void getLocationInDragLayer(int[] loc) {
 
     }
 }

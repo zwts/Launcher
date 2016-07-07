@@ -2,6 +2,7 @@ package com.tanshizw.launcher;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -11,15 +12,23 @@ import android.widget.TextView;
 import com.tanshizw.launcher.items.BubbleTextView;
 import com.tanshizw.launcher.items.ItemInfo;
 
+import java.util.Stack;
+
 /**
  * Created by user on 6/6/16.
  */
 public class CellLayout extends ViewGroup {
+    private final String TAG = "CellLayout";
     private int mCountX;
     private int mCountY;
     boolean[][] mOccupied;
     private ShortcutAndWidgetContainer mShortcutsAndWidgets;
-    private final String TAG = "CellLayout";
+    private int mCellWidth;
+    private int mCellHeight;
+    private int mWidthGap;
+    private int mHeightGap;
+    public static final int MODE_ON_DROP = 2;
+    final int[] mTmpPoint = new int[2];
 
     public CellLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -139,6 +148,7 @@ public class CellLayout extends ViewGroup {
         // Y coordinate of the view in the layout.
         public int y;
 
+        boolean dropped;
         public LayoutParams(Context c, AttributeSet attrs) {
             super(c, attrs);
         }
@@ -189,4 +199,175 @@ public class CellLayout extends ViewGroup {
             container = info.container;
         }
     }
+
+    private final Stack<Rect> mTempRectStack = new Stack<>();
+    private void lazyInitTempRectStack() {
+        if (mTempRectStack.isEmpty()) {
+            for (int i = 0; i < mCountX * mCountY; i++) {
+                mTempRectStack.push(new Rect());
+            }
+        }
+    }
+
+    public float getDistanceFromCell(float x, float y, int[] cell) {
+        cellToCenterPoint(cell[0], cell[1], mTmpPoint);
+        return (float) Math.hypot(x - mTmpPoint[0], y - mTmpPoint[1]);
+    }
+
+    /**
+     * Given a cell coordinate, return the point that represents the center of the cell
+     *
+     * @param cellX X coordinate of the cell
+     * @param cellY Y coordinate of the cell
+     *
+     * @param result Array of 2 ints to hold the x and y coordinate of the point
+     */
+    void cellToCenterPoint(int cellX, int cellY, int[] result) {
+        regionToCenterPoint(cellX, cellY, 1, 1, result);
+    }
+
+    /**
+     * Given a cell coordinate and span return the point that represents the center of the regio
+     *
+     * @param cellX X coordinate of the cell
+     * @param cellY Y coordinate of the cell
+     *
+     * @param result Array of 2 ints to hold the x and y coordinate of the point
+     */
+    void regionToCenterPoint(int cellX, int cellY, int spanX, int spanY, int[] result) {
+        final int hStartPadding = getPaddingLeft();
+        final int vStartPadding = getPaddingTop();
+        result[0] = hStartPadding + cellX * (mCellWidth + mWidthGap) +
+                (spanX * mCellWidth + (spanX - 1) * mWidthGap) / 2;
+        result[1] = vStartPadding + cellY * (mCellHeight + mHeightGap) +
+                (spanY * mCellHeight + (spanY - 1) * mHeightGap) / 2;
+    }
+
+    /**
+     * Find a starting cell position that will fit the given bounds nearest the requested
+     * cell location. Uses Euclidean distance to score multiple vacant areas.
+     *
+     * @param pixelX The X location at which you want to search for a vacant area.
+     * @param pixelY The Y location at which you want to search for a vacant area.
+     * @param spanX Horizontal span of the object.
+     * @param spanY Vertical span of the object.
+     * @param result Previously returned value to possibly recycle.
+     * @return The X, Y cell of a vacant area that can contain this object,
+     *         nearest the requested location.
+     */
+    int[] findNearestArea(int pixelX, int pixelY, int spanX, int spanY, int[] result) {
+        return findNearestArea(pixelX, pixelY, spanX, spanY, spanX, spanY, false, result, null);
+    }
+
+    private void recycleTempRects(Stack<Rect> used) {
+        while (!used.isEmpty()) {
+            mTempRectStack.push(used.pop());
+        }
+    }
+
+    /**
+     * Find a vacant area that will fit the given bounds nearest the requested
+     * cell location. Uses Euclidean distance to score multiple vacant areas.
+     *
+     * @param pixelX The X location at which you want to search for a vacant area.
+     * @param pixelY The Y location at which you want to search for a vacant area.
+     * @param minSpanX The minimum horizontal span required
+     * @param minSpanY The minimum vertical span required
+     * @param spanX Horizontal span of the object.
+     * @param spanY Vertical span of the object.
+     * @param ignoreOccupied If true, the result can be an occupied cell
+     * @param result Array in which to place the result, or null (in which case a new array will
+     *        be allocated)
+     * @return The X, Y cell of a vacant area that can contain this object,
+     *         nearest the requested location.
+     */
+    private int[] findNearestArea(int pixelX, int pixelY, int minSpanX, int minSpanY, int spanX,
+                                  int spanY, boolean ignoreOccupied, int[] result, int[] resultSpan) {
+        lazyInitTempRectStack();
+
+        // For items with a spanX / spanY > 1, the passed in point (pixelX, pixelY) corresponds
+        // to the center of the item, but we are searching based on the top-left cell, so
+        // we translate the point over to correspond to the top-left.
+        pixelX -= (mCellWidth + mWidthGap) * (spanX - 1) / 2f;
+        pixelY -= (mCellHeight + mHeightGap) * (spanY - 1) / 2f;
+
+        // Keep track of best-scoring drop area
+        final int[] bestXY = result != null ? result : new int[2];
+        double bestDistance = Double.MAX_VALUE;
+        final Rect bestRect = new Rect(-1, -1, -1, -1);
+        final Stack<Rect> validRegions = new Stack<Rect>();
+
+        final int countX = mCountX;
+        final int countY = mCountY;
+
+        if (minSpanX <= 0 || minSpanY <= 0 || spanX <= 0 || spanY <= 0 ||
+                spanX < minSpanX || spanY < minSpanY) {
+            return bestXY;
+        }
+
+        for (int y = 0; y < countY - (minSpanY - 1); y++) {
+            inner:
+            for (int x = 0; x < countX - (minSpanX - 1); x++) {
+                int ySize = -1;
+                int xSize = -1;
+                final int[] cellXY = mTmpPoint;
+                cellToCenterPoint(x, y, cellXY);
+
+                // We verify that the current rect is not a sub-rect of any of our previous
+                // candidates. In this case, the current rect is disqualified in favour of the
+                // containing rect.
+                Rect currentRect = mTempRectStack.pop();
+                currentRect.set(x, y, x + xSize, y + ySize);
+                boolean contained = false;
+                for (Rect r : validRegions) {
+                    if (r.contains(currentRect)) {
+                        contained = true;
+                        break;
+                    }
+                }
+                validRegions.push(currentRect);
+                double distance = Math.hypot(cellXY[0] - pixelX,  cellXY[1] - pixelY);
+
+                if ((distance <= bestDistance && !contained) ||
+                        currentRect.contains(bestRect)) {
+                    bestDistance = distance;
+                    bestXY[0] = x;
+                    bestXY[1] = y;
+                    if (resultSpan != null) {
+                        resultSpan[0] = xSize;
+                        resultSpan[1] = ySize;
+                    }
+                    bestRect.set(currentRect);
+                }
+            }
+        }
+
+        // Return -1, -1 if no suitable location found
+        if (bestDistance == Double.MAX_VALUE) {
+            bestXY[0] = -1;
+            bestXY[1] = -1;
+        }
+        recycleTempRects(validRegions);
+        return bestXY;
+    }
+
+    public ShortcutAndWidgetContainer getShortcutsAndWidgets() {
+        return mShortcutsAndWidgets;
+    }
+
+    /**
+     * Mark a child as having been dropped.
+     * At the beginning of the drag operation, the child may have been on another
+     * screen, but it is re-parented before this method is called.
+     *
+     * @param child The child that is being dropped
+     */
+    void onDropChild(View child) {
+        if (child != null) {
+            LayoutParams lp = (LayoutParams) child.getLayoutParams();
+            lp.dropped = true;
+            child.requestLayout();
+        }
+    }
+
 }

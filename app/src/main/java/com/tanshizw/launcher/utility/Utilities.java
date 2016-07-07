@@ -12,6 +12,7 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Rect;
@@ -252,6 +253,46 @@ public final class Utilities {
             pt[0] += v0.getLeft();
             pt[1] += v0.getTop();
             scale *= v0.getScaleX();//what's this?
+        }
+
+        coord[0] = (int) Math.round(pt[0]);
+        coord[1] = (int) Math.round(pt[1]);
+        return scale;
+    }
+
+    /**
+     * Inverse of setDescendantCoordRelativeToSelf.
+     */
+    public static float mapCoordInSelfToDescendent(View descendant, View root,
+                                                   int[] coord) {
+        ArrayList<View> ancestorChain = new ArrayList<View>();
+
+        float[] pt = {coord[0], coord[1]};
+
+        View v = descendant;
+        while(v != root) {
+            ancestorChain.add(v);
+            v = (View) v.getParent();
+        }
+        ancestorChain.add(root);
+
+        float scale = 1.0f;
+        Matrix inverse = new Matrix();
+        int count = ancestorChain.size();
+        for (int i = count - 1; i >= 0; i--) {
+            View ancestor = ancestorChain.get(i);
+            View next = i > 0 ? ancestorChain.get(i-1) : null;
+
+            pt[0] += ancestor.getScrollX();
+            pt[1] += ancestor.getScrollY();
+
+            if (next != null) {
+                pt[0] -= next.getLeft();
+                pt[1] -= next.getTop();
+                next.getMatrix().invert(inverse);
+                inverse.mapPoints(pt);
+                scale *= next.getScaleX();
+            }
         }
 
         coord[0] = (int) Math.round(pt[0]);
